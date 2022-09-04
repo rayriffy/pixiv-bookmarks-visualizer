@@ -8,7 +8,7 @@ How to use?
 
 > **Caution!** This project is only built for running locally, please do not deploy to public internet otherwise it might not working properly, or all of your private bookmarks will be public
 
-First, you have to get your account refresh token in any mean nessesary. I reccomend [this script](https://github.com/eggplants/get-pixivpy-token) to obtain refresh token.
+First, you have to get your account refresh token in any mean nessesary. I recommend [this script](https://github.com/eggplants/get-pixivpy-token) to obtain refresh token.
 
 Then, make your own `.env` file based on `.env.example` by providing refresh token and your user ID into the file.
 
