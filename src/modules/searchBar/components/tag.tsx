@@ -27,8 +27,14 @@ export const TagSeachBar: FunctionComponent = () => {
       ).then(o => o.json())
 
       return expectedResults.tags.map(tag => ({
-        value: tag.name,
-        label: `${tag.name} (${tag.count})`,
+        value: tag.name.original,
+        label: (
+          <p className='flex items-center'>
+            <span className="font-medium">{tag.name.original}</span>
+            <span className='ml-2 text-gray-500 text-sm'>{tag.name.translated}</span>
+            <span className="text-xs text-white bg-gray-900 py-0.5 px-2 rounded-md ml-2">{tag.count}</span>
+          </p>
+        ),
       }))
     } catch (e) {
       console.error(e)

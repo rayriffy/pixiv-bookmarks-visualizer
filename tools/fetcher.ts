@@ -24,7 +24,7 @@ const getBookmarks = async (pixiv: Pixiv, restrict: 'public' | 'private'): Promi
   if (pixiv.user.nextURL)
     bookmarks = await pixiv.util.multiCall(
       { next_url: pixiv.user.nextURL, illusts: bookmarks },
-      30
+      9999999
     )
 
   return bookmarks.map(o => ({

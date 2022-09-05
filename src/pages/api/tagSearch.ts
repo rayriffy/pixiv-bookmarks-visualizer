@@ -9,7 +9,10 @@ import { TagSearchResponse } from '../../core/@types/api/TagSearchResponse'
 import { ExtendedPixivIllust } from '../../core/@types/ExtendedPixivIllust'
 
 interface NumberizedTag {
-  name: string
+  name: {
+    original: string
+    translated: string | null
+  }
   count: number
 }
 
@@ -36,7 +39,10 @@ const api: NextApiHandler = async (req, res) => {
   const processedTags: NumberizedTag[] = sortBy(
     Object.entries(groupBy(searchedTags, o => o.name)).map(
       ([tagName, items]) => ({
-        name: tagName,
+        name: {
+          original: items[0].name,
+          translated: items[0].translated_name
+        },
         count: items.length,
       })
     ),
@@ -45,7 +51,7 @@ const api: NextApiHandler = async (req, res) => {
 
   const payload: TagSearchResponse = {
     tags: processedTags.filter(tag =>
-      query.length === 0 ? true : tag.name.includes(query)
+      query.length === 0 ? true : (tag.name.original.includes(query) || (tag.name.translated ?? "").toLowerCase().includes(query.toLowerCase()))
     ),
   }
 
