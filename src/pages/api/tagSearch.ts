@@ -2,7 +2,7 @@ import fs from 'fs'
 import path from 'path'
 
 import { NextApiHandler } from 'next'
-import { chunk, groupBy, sortBy } from 'lodash'
+import { chunk, groupBy, reverse, sortBy } from 'lodash'
 
 import { TagSearchRequest } from '../../core/@types/api/TagSearchRequest'
 import { TagSearchResponse } from '../../core/@types/api/TagSearchResponse'
@@ -26,34 +26,50 @@ const api: NextApiHandler = async (req, res) => {
 
   const { query, selectedTags } = req.query as unknown as TagSearchRequest
 
-  const transformedSelectedTags = selectedTags === undefined ? [] : typeof selectedTags === 'string' ? [selectedTags] : selectedTags
+  const transformedSelectedTags =
+    selectedTags === undefined
+      ? []
+      : typeof selectedTags === 'string'
+      ? [selectedTags]
+      : selectedTags
 
   const searchedTags = illusts
     .map(o => o.tags)
     .filter(illustTags =>
       transformedSelectedTags.length === 0
         ? true
-        : transformedSelectedTags.every(selectedTag => illustTags.map(o => o.name).includes(selectedTag))
+        : transformedSelectedTags.every(selectedTag =>
+            illustTags.map(o => o.name).includes(selectedTag)
+          )
     )
     .flat()
-  const processedTags: NumberizedTag[] = sortBy(
-    Object.entries(groupBy(searchedTags, o => o.name)).map(
-      ([tagName, items]) => ({
-        name: {
-          original: items[0].name,
-          translated: items[0].translated_name
-        },
-        count: items.length,
-      })
-    ),
-    ['name']
+  const processedTags: NumberizedTag[] = reverse(
+    sortBy(
+      Object.entries(groupBy(searchedTags, o => o.name)).map(
+        ([tagName, items]) => ({
+          name: {
+            original: items[0].name,
+            translated: items[0].translated_name,
+          },
+          count: items.length,
+        })
+      ),
+      ['count', o => o.name.original]
+    )
   )
 
   const payload: TagSearchResponse = {
     tags: processedTags.filter(tag =>
-      query.length === 0 ? true : (tag.name.original.includes(query) || (tag.name.translated ?? "").toLowerCase().includes(query.toLowerCase()))
+      query.length === 0
+        ? true
+        : tag.name.original.includes(query) ||
+          (tag.name.translated ?? '')
+            .toLowerCase()
+            .includes(query.toLowerCase())
     ),
   }
+
+  res.setHeader('Cache-Control', 'max-age=60')
 
   return res.send(payload)
 }

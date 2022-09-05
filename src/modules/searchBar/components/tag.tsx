@@ -1,6 +1,7 @@
 import { FunctionComponent, useContext, useState } from 'react'
 
 import Async from 'react-select/async'
+import { WindowedMenuList } from 'react-windowed-select'
 
 import { buildURLParams } from '../../../core/services/buildURLParams'
 
@@ -49,6 +50,9 @@ export const TagSeachBar: FunctionComponent = () => {
       loadOptions={tagLoadOptions}
       isLoading={loading}
       onChange={val => setTags(val.map(o => o.value))}
+      components={{
+        MenuList: WindowedMenuList
+      }}
     />
   )
 }
