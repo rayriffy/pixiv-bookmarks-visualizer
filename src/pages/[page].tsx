@@ -53,8 +53,11 @@ const Page: NextPage = props => {
         <h1>Failed to fetch</h1>
       ) : (
         <section>
+          <div className="my-2">
+            <h2 className="text-sm font-semibold">{(data.count ?? -1).toLocaleString()} results found</h2>
+          </div>
           <Pagination {...data.paginate} />
-          <div className="grid grid-cols-5 gap-4 items-center">
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 items-center">
             {data.illusts.map(illust => (
               <div key={`illust-${illust.id}`} className="mx-auto">
                 <a href={`https://www.pixiv.net/artworks/${illust.id}`} target="_blank" rel="noopener noreferrer">
@@ -64,6 +67,7 @@ const Page: NextPage = props => {
                     })}`}
                     width={illust.width}
                     height={illust.height}
+                    loading="lazy"
                   />
                 </a>
               </div>

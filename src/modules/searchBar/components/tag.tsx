@@ -1,4 +1,4 @@
-import { FunctionComponent, useContext, useState } from 'react'
+import { memo, useContext, useState } from 'react'
 
 import Async from 'react-select/async'
 import { WindowedMenuList } from 'react-windowed-select'
@@ -9,7 +9,7 @@ import { TagSearchRequest } from '../../../core/@types/api/TagSearchRequest'
 import { TagSearchResponse } from '../../../core/@types/api/TagSearchResponse'
 import { SearchBarContext } from '../../../context/SearchBarContext'
 
-export const TagSeachBar: FunctionComponent = () => {
+export const TagSeachBar = memo(() => {
   const searchBarContext = useContext(SearchBarContext)
   const [tags, setTags] = searchBarContext.tags
 
@@ -55,4 +55,4 @@ export const TagSeachBar: FunctionComponent = () => {
       }}
     />
   )
-}
+})

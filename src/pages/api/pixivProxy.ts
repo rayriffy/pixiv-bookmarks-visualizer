@@ -14,6 +14,8 @@ const api: NextApiHandler = async (req, res) => {
     const fetchedImage = await fetchedResponse.arrayBuffer()
   
     res.setHeader('Content-Type', `image/${last(url.split('.'))}`)
+    res.setHeader('Cache-Control', 'max-age=30000')
+
     res.status(200).send(Buffer.from(fetchedImage))
     res.end()
   } catch (e) {

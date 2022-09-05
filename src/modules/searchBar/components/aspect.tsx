@@ -1,9 +1,9 @@
-import { FunctionComponent, useContext, useEffect, useState } from 'react'
+import { memo, useContext, useEffect, useState } from 'react'
 import { SearchBarContext } from '../../../context/SearchBarContext'
 
 import { classNames } from '../../../core/components/classNames'
 
-export const Aspect: FunctionComponent = props => {
+export const Aspect = memo(() => {
   const [toggleHorizontal, setToggleHorizontal] = useState(false)
   const [toggleVertical, setToggleVertical] = useState(false)
 
@@ -43,4 +43,4 @@ export const Aspect: FunctionComponent = props => {
       </button>
     </span>
   )
-}
+})

@@ -1,12 +1,10 @@
-import fs from 'fs'
-import path from 'path'
-
 import { NextApiHandler } from 'next'
-import { chunk, groupBy, reverse, sortBy } from 'lodash'
+import { groupBy, reverse, sortBy } from 'lodash'
+
+import { getIllusts } from '../../core/services/getIllusts'
 
 import { TagSearchRequest } from '../../core/@types/api/TagSearchRequest'
 import { TagSearchResponse } from '../../core/@types/api/TagSearchResponse'
-import { ExtendedPixivIllust } from '../../core/@types/ExtendedPixivIllust'
 
 interface NumberizedTag {
   name: {
@@ -17,12 +15,7 @@ interface NumberizedTag {
 }
 
 const api: NextApiHandler = async (req, res) => {
-  const illusts: ExtendedPixivIllust[] = JSON.parse(
-    fs.readFileSync(
-      path.join(process.cwd(), '.next/cache', 'bookmarks.json'),
-      'utf8'
-    )
-  )
+  const illusts = await getIllusts()
 
   const { query, selectedTags } = req.query as unknown as TagSearchRequest
 

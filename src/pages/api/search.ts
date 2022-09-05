@@ -1,20 +1,13 @@
-import fs from 'fs'
-import path from 'path'
-
 import { NextApiHandler } from 'next'
 import { chunk } from 'lodash'
 
+import { getIllusts } from '../../core/services/getIllusts'
+
 import { SearchRequest } from '../../core/@types/api/SearchRequest'
 import { SearchResult } from '../../core/@types/api/SearchResult'
-import { ExtendedPixivIllust } from '../../core/@types/ExtendedPixivIllust'
 
 const api: NextApiHandler = async (req, res) => {
-  const illusts: ExtendedPixivIllust[] = JSON.parse(
-    fs.readFileSync(
-      path.join(process.cwd(), '.next/cache', 'bookmarks.json'),
-      'utf8'
-    )
-  )
+  const illusts = await getIllusts()
 
   const searchRequest = req.query as unknown as SearchRequest
   const targetPage = Number(searchRequest.page)
@@ -53,6 +46,7 @@ const api: NextApiHandler = async (req, res) => {
 
   const payload: SearchResult = {
     illusts: illustChunks[targetPage - 1] ?? [],
+    count: filteredIllusts.length,
     paginate: {
       current: targetPage,
       max: illustChunks.length,

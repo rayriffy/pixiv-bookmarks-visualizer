@@ -1,9 +1,9 @@
-import { FunctionComponent, useContext, useEffect, useState } from 'react'
+import { memo, useContext, useEffect, useState } from 'react'
 import { SearchBarContext } from '../../../context/SearchBarContext'
 
 import { classNames } from '../../../core/components/classNames'
 
-export const Restriction: FunctionComponent = props => {
+export const Restriction = memo(() => {
   const [togglePublic, setTogglePublic] = useState(true)
   const [togglePrivate, setTogglePrivate] = useState(false)
 
@@ -43,4 +43,4 @@ export const Restriction: FunctionComponent = props => {
       </button>
     </span>
   )
-}
+})
