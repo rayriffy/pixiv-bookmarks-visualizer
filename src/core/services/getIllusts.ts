@@ -12,4 +12,6 @@ export const getIllusts = mem(async (): Promise<ExtendedPixivIllust[]> => {
       'utf8'
     )
   )
+}, {
+  maxAge: 2 * 60 * 1000
 })
