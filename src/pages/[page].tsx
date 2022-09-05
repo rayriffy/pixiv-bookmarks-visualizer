@@ -68,7 +68,9 @@ const Page: NextPage = props => {
                   rel="noopener noreferrer"
                   className="relative"
                 >
-                  <div className="absolute bg-black px-1.5 py-0.5 text-xs font-mono text-white opacity-70">{illust.width} x {illust.height}</div>
+                  <div className="absolute bg-black px-1.5 py-0.5 text-xs font-mono text-white opacity-70 z-10 top-0 left-0">
+                    {illust.width} x {illust.height}
+                  </div>
                   <img
                     src={`/api/pixivProxy?${stringify({
                       url: illust.image_urls.medium,
