@@ -6,13 +6,12 @@ import { Aspect } from './aspect'
 
 export const SearchBar: FunctionComponent = () => {
   return (
-    <div className="p-6 border border-dashed rounded-xl">
-      <TagSeachBar />
-
-      <div className="mt-4 flex space-x-4">
+    <div className="p-6 border border-dashed rounded-xl space-y-4">
+      <div className="flex space-x-4">
         <Restriction />
         <Aspect />
       </div>
+      <TagSeachBar />
     </div>
   )
 }

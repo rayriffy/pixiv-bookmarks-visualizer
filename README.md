@@ -3,6 +3,8 @@ pixiv Bookmarks Visualizer
 
 Performing complex search with your pixiv bookmarks.
 
+![](./img/screenshot.jpg)
+
 How to use?
 ---
 
