@@ -61,16 +61,15 @@ const Page: NextPage = props => {
           <Pagination {...data.paginate} />
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4 gap-6 items-center">
             {data.illusts.map(illust => (
-              <div key={`illust-${illust.id}`} className="mx-auto">
+              <div key={`illust-${illust.id}`} className="mx-auto relative">
                 <a
                   href={`https://www.pixiv.net/artworks/${illust.id}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="relative"
                 >
-                  <div className="absolute bg-black px-1.5 py-0.5 text-xs font-mono text-white opacity-70 z-10 top-0 left-0">
+                  <span className="absolute bg-black px-1.5 py-0.5 text-xs font-mono text-white opacity-70 z-10 top-0 left-0">
                     {illust.width} x {illust.height}
-                  </div>
+                  </span>
                   <img
                     src={`/api/pixivProxy?${stringify({
                       url: illust.image_urls.medium,
