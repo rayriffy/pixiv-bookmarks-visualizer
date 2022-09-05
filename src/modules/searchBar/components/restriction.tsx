@@ -4,7 +4,7 @@ import { SearchBarContext } from '../../../context/SearchBarContext'
 import { classNames } from '../../../core/components/classNames'
 
 export const Restriction: FunctionComponent = props => {
-  const [togglePublic, setTogglePublic] = useState(false)
+  const [togglePublic, setTogglePublic] = useState(true)
   const [togglePrivate, setTogglePrivate] = useState(false)
 
   const searchBarContext = useContext(SearchBarContext)

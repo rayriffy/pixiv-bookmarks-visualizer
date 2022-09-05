@@ -12,7 +12,7 @@ const App: NextPage<AppProps> = props => {
   const { Component, pageProps } = props
 
   const tagState = useState<string[]>([])
-  const restrictState = useState<'all' | 'public' | 'private'>('all')
+  const restrictState = useState<'all' | 'public' | 'private'>('public')
   const aspectState = useState<'all' | 'horizontal' | 'vertical'>('all')
 
   return (

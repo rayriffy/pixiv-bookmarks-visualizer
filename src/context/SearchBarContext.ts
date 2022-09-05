@@ -10,6 +10,6 @@ interface Context {
 
 export const SearchBarContext = createContext<Context>({
   tags: [[], () => {}],
-  restriction: ['all', () => {}],
+  restriction: ['public', () => {}],
   aspect: ['all', () => {}],
 })
