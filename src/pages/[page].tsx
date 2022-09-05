@@ -67,7 +67,7 @@ const Page: NextPage = props => {
                   target="_blank"
                   rel="noopener noreferrer"
                 >
-                  <span className="absolute bg-black px-1.5 py-0.5 text-xs font-mono text-white opacity-70 z-10 top-0 left-0">
+                  <span className="absolute bg-black px-1.5 py-0.5 text-xs font-mono text-white opacity-70 z-[1] top-0 left-0">
                     {illust.width} x {illust.height}
                   </span>
                   <img

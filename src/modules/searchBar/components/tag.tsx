@@ -57,6 +57,12 @@ export const TagSeachBar = memo(() => {
       components={{
         MenuList: WindowedMenuList,
       }}
+      styles={{
+        menu: provided => ({
+          ...provided,
+          zIndex: 10
+        })
+      }}
     />
   )
 })
