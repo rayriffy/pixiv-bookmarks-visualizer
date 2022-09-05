@@ -24,7 +24,7 @@ const getBookmarks = async (pixiv: Pixiv, restrict: 'public' | 'private'): Promi
   if (pixiv.user.nextURL)
     bookmarks = await pixiv.util.multiCall(
       { next_url: pixiv.user.nextURL, illusts: bookmarks },
-      500
+      30
     )
 
   return bookmarks.map(o => ({
@@ -37,8 +37,11 @@ const getBookmarks = async (pixiv: Pixiv, restrict: 'public' | 'private'): Promi
   const pixiv = await Pixiv.refreshLogin(
     PIXIV_REFRESH_TOKEN
   )
+  pixiv.setLanguage('English')
 
+  console.log('fetching public bookmarks...')
   const publicIllust = await getBookmarks(pixiv, 'public')
+  console.log('fetcing private bookmarks...')
   const privateIllust = await getBookmarks(pixiv, 'private')
 
   // const [publicIllust, privateIllust] = await Promise.all([
@@ -71,5 +74,6 @@ const getBookmarks = async (pixiv: Pixiv, restrict: 'public' | 'private'): Promi
     )
   )
 })().catch(e => {
-  console.log(e.response.data)
+  console.log(e)
+  // console.log(e.response.data)
 })
