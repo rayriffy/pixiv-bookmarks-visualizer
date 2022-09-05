@@ -5,14 +5,14 @@ import { last } from 'lodash'
 const api: NextApiHandler = async (req, res) => {
   try {
     const url = req.query.url as string
-  
+
     const fetchedResponse = await fetch(url, {
       headers: {
-        referer: 'https://www.pixiv.net/'
+        referer: 'https://www.pixiv.net/',
       },
     })
     const fetchedImage = await fetchedResponse.arrayBuffer()
-  
+
     res.setHeader('Content-Type', `image/${last(url.split('.'))}`)
     res.setHeader('Cache-Control', 'max-age=30000')
 

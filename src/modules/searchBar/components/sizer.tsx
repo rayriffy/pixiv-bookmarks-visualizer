@@ -1,5 +1,11 @@
 import { debounce } from 'lodash'
-import { ChangeEventHandler, memo, useCallback, useContext, useState } from 'react'
+import {
+  ChangeEventHandler,
+  memo,
+  useCallback,
+  useContext,
+  useState,
+} from 'react'
 import { SearchBarContext } from '../../../context/SearchBarContext'
 import { classNames } from '../../../core/components/classNames'
 
@@ -17,10 +23,14 @@ export const Sizer = memo(() => {
   const [input, setInput] = useState(minimumSizer.size.toString())
 
   const setDebounceInput = debounce(value => {
-    if (!Number.isNaN(Number(value)) && Number(value) >= 0 && value.length !== 0) {
+    if (
+      !Number.isNaN(Number(value)) &&
+      Number(value) >= 0 &&
+      value.length !== 0
+    ) {
       setMinimumSizer(prev => ({
         ...prev,
-        size: Number(value)
+        size: Number(value),
       }))
     }
   }, 400)

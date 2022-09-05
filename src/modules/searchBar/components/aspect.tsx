@@ -11,7 +11,12 @@ export const Aspect = memo(() => {
   const [_, setAspect] = searchBarContext.aspect
 
   useEffect(() => {
-    const selectedMode = toggleHorizontal === toggleVertical ? 'all' : toggleHorizontal ? 'horizontal' : 'vertical'
+    const selectedMode =
+      toggleHorizontal === toggleVertical
+        ? 'all'
+        : toggleHorizontal
+        ? 'horizontal'
+        : 'vertical'
     setAspect(selectedMode)
   }, [toggleHorizontal, toggleVertical])
 

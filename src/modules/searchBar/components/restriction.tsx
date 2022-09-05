@@ -11,7 +11,12 @@ export const Restriction = memo(() => {
   const [_, setRestriction] = searchBarContext.restriction
 
   useEffect(() => {
-    const selectedMode = togglePublic === togglePrivate ? 'all' : togglePublic ? 'public' : 'private'
+    const selectedMode =
+      togglePublic === togglePrivate
+        ? 'all'
+        : togglePublic
+        ? 'public'
+        : 'private'
     setRestriction(selectedMode)
   }, [togglePublic, togglePrivate])
 

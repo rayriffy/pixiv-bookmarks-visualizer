@@ -53,11 +53,7 @@ export const Pagination = memo<Props>(props => {
         >
           {link ? (
             <Link
-              href={
-                startPoint + i === 0
-                  ? '/'
-                  : `/${startPoint + i + 1}`
-              }
+              href={startPoint + i === 0 ? '/' : `/${startPoint + i + 1}`}
               aria-label={`${startPoint + i + 1}`}
             >
               <a>

@@ -23,10 +23,7 @@ const Page: NextPage = props => {
   const [minimumSizer] = searchBarContext.minimumSizer
 
   const pageNumber = useMemo(
-    () =>
-      query.page === undefined
-        ? 1
-        : Number(query.page as string),
+    () => (query.page === undefined ? 1 : Number(query.page as string)),
     [query]
   )
 
@@ -55,14 +52,21 @@ const Page: NextPage = props => {
         <h1>Failed to fetch</h1>
       ) : (
         <section>
-          <div className="my-2">
-            <h2 className="text-sm font-semibold">{(data.count ?? -1).toLocaleString()} results found</h2>
+          <div className="my-1">
+            <h2 className="text-sm font-semibold">
+              {(data.count ?? -1).toLocaleString()} images found, with a total
+              of {data.paginate.max} pages
+            </h2>
           </div>
           <Pagination {...data.paginate} />
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4 gap-6 items-center">
             {data.illusts.map(illust => (
               <div key={`illust-${illust.id}`} className="mx-auto">
-                <a href={`https://www.pixiv.net/artworks/${illust.id}`} target="_blank" rel="noopener noreferrer">
+                <a
+                  href={`https://www.pixiv.net/artworks/${illust.id}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
                   <img
                     src={`/api/pixivProxy?${stringify({
                       url: illust.image_urls.large,
