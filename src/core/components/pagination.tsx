@@ -5,7 +5,6 @@ import Link from 'next/link'
 interface Props {
   max: number
   current: number
-  prefix?: string
   link?: boolean
   onChange?(page: number): void
 }
@@ -33,7 +32,7 @@ const Page = memo<PageProps>(props => {
 })
 
 export const Pagination = memo<Props>(props => {
-  const { max, current, prefix = '/', link = true, onChange } = props
+  const { max, current, link = true, onChange } = props
 
   const pageLength: number = max > 5 ? 5 : max
   const startPoint: number =
@@ -56,8 +55,8 @@ export const Pagination = memo<Props>(props => {
             <Link
               href={
                 startPoint + i === 0
-                  ? prefix
-                  : `${prefix}p/${startPoint + i + 1}`
+                  ? '/'
+                  : `/${startPoint + i + 1}`
               }
               aria-label={`${startPoint + i + 1}`}
             >

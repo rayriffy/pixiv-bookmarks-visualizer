@@ -26,7 +26,7 @@ const Page: NextPage = props => {
     () =>
       query.page === undefined
         ? 1
-        : Number((query.page as string[])[(query.page as string[]).length - 1]),
+        : Number(query.page as string),
     [query]
   )
 

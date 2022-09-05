@@ -59,6 +59,8 @@ const api: NextApiHandler = async (req, res) => {
     },
   }
 
+  res.setHeader('Cache-Control', 'max-age=300')
+
   return res.send(payload)
 }
 
