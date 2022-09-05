@@ -55,7 +55,7 @@ const Page: NextPage = props => {
           <div className="my-1">
             <h2 className="text-sm font-semibold">
               {(data.count ?? -1).toLocaleString()} images found, with a total
-              of {data.paginate.max} pages
+              of {data.paginate.max.toLocaleString()} pages
             </h2>
           </div>
           <Pagination {...data.paginate} />
@@ -66,10 +66,12 @@ const Page: NextPage = props => {
                   href={`https://www.pixiv.net/artworks/${illust.id}`}
                   target="_blank"
                   rel="noopener noreferrer"
+                  className="relative"
                 >
+                  <div className="absolute bg-black px-1.5 py-0.5 text-xs font-mono text-white opacity-70">{illust.width} x {illust.height}</div>
                   <img
                     src={`/api/pixivProxy?${stringify({
-                      url: illust.image_urls.large,
+                      url: illust.image_urls.medium,
                     })}`}
                     width={illust.width}
                     height={illust.height}
