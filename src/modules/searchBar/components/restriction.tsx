@@ -16,7 +16,7 @@ export const Restriction = memo(() => {
   }, [togglePublic, togglePrivate])
 
   return (
-    <span className="isolate inline-flex rounded-md shadow-sm">
+    <span className="isolate inline-flex rounded-md shadow-sm m-1">
       <button
         type="button"
         onClick={() => setTogglePublic(o => !o)}

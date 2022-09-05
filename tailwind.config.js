@@ -10,5 +10,9 @@ module.exports = {
     './src/**/*.jsx',
     './src/**/*.js',
   ],
-  plugins: [],
+  plugins: [
+    require('@tailwindcss/forms')({
+      strategy: 'class'
+    })
+  ],
 }

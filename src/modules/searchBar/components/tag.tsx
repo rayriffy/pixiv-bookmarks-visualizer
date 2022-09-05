@@ -51,7 +51,7 @@ export const TagSeachBar = memo(() => {
       isLoading={loading}
       onChange={val => setTags(val.map(o => o.value))}
       components={{
-        MenuList: WindowedMenuList
+        MenuList: WindowedMenuList,
       }}
     />
   )

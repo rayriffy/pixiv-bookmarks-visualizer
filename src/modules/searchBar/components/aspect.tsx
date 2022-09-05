@@ -16,7 +16,7 @@ export const Aspect = memo(() => {
   }, [toggleHorizontal, toggleVertical])
 
   return (
-    <span className="isolate inline-flex rounded-md shadow-sm">
+    <span className="isolate inline-flex rounded-md shadow-sm m-1">
       <button
         type="button"
         onClick={() => setToggleHorizontal(o => !o)}

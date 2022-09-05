@@ -5,7 +5,6 @@ import { stringify } from 'querystring'
 import { useMemo, useContext } from 'react'
 import useSWR from 'swr'
 
-import { Image } from '../core/components/image'
 import { buildURLParams } from '../core/services/buildURLParams'
 import { SearchBarContext } from '../context/SearchBarContext'
 import { Pagination } from '../core/components/pagination'
@@ -21,6 +20,7 @@ const Page: NextPage = props => {
   const [tags] = searchBarContext.tags
   const [restrict] = searchBarContext.restriction
   const [aspect] = searchBarContext.aspect
+  const [minimumSizer] = searchBarContext.minimumSizer
 
   const pageNumber = useMemo(
     () =>
@@ -36,8 +36,10 @@ const Page: NextPage = props => {
       tags,
       restrict,
       aspect,
+      sizerMode: minimumSizer.mode,
+      sizerSize: minimumSizer.size.toString(),
     }),
-    [pageNumber, tags, restrict, aspect]
+    [pageNumber, tags, restrict, aspect, minimumSizer.mode, minimumSizer.size]
   )
 
   const { data, error } = useSWR<SearchResult, any, string>(
@@ -57,7 +59,7 @@ const Page: NextPage = props => {
             <h2 className="text-sm font-semibold">{(data.count ?? -1).toLocaleString()} results found</h2>
           </div>
           <Pagination {...data.paginate} />
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 items-center">
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4 gap-6 items-center">
             {data.illusts.map(illust => (
               <div key={`illust-${illust.id}`} className="mx-auto">
                 <a href={`https://www.pixiv.net/artworks/${illust.id}`} target="_blank" rel="noopener noreferrer">

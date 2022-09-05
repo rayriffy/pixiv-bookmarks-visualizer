@@ -45,7 +45,7 @@ export const Pagination = memo<Props>(props => {
       : 0
 
   return (
-    <div className="flex justify-center md:py-3 lg:py-5">
+    <div className="flex justify-center py-5">
       {Array.from({ length: pageLength }, (_, i) => (
         <div
           key={`pagination-${startPoint + i}`}

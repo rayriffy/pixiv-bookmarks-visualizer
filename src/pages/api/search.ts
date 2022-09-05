@@ -20,6 +20,7 @@ const api: NextApiHandler = async (req, res) => {
       : searchRequest.tags
 
   const filteredIllusts = illusts
+    // search restriction
     .filter(illust => {
       if (searchRequest.restrict === 'all')
         return true
@@ -28,6 +29,7 @@ const api: NextApiHandler = async (req, res) => {
       else if (searchRequest.restrict === 'private')
         return illust.bookmark_private === true
     })
+    // search image orientation
     .filter(illust => {
       if (searchRequest.aspect === 'all')
         return true
@@ -36,6 +38,14 @@ const api: NextApiHandler = async (req, res) => {
       else if (searchRequest.aspect === 'vertical')
         return illust.width / illust.height <= 1
     })
+    // search image size
+    .filter(illust => {
+      if (searchRequest.sizerMode === 'none')
+        return true
+      else
+        return illust[searchRequest.sizerMode] >= Number(searchRequest.sizerSize)
+    })
+    // search image tag
     .filter(illust =>
       searchTags.length === 0
         ? true
