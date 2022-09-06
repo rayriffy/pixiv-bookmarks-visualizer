@@ -1,24 +1,38 @@
+import fs from 'fs'
+import path from 'path'
+
 import { NextApiHandler } from 'next'
 
 import { last } from 'lodash'
+
+const cacheDirectory = path.join(process.cwd(), '.next/cache/pixivProxy')
 
 const api: NextApiHandler = async (req, res) => {
   try {
     const url = req.query.url as string
 
-    const fetchedResponse = await fetch(url, {
-      headers: {
-        referer: 'https://www.pixiv.net/',
-      },
-    })
-    const fetchedImage = await fetchedResponse.arrayBuffer()
+    const expectedCachePath = path.join(cacheDirectory, path.basename(url))
+    if (fs.existsSync(path.join(expectedCachePath))) {
+      const fetchedImage = fs.readFileSync(expectedCachePath)
+      res.status(200).send(Buffer.from(fetchedImage))
+    } else {
+      const fetchedResponse = await fetch(url, {
+        headers: {
+          referer: 'https://www.pixiv.net/',
+        },
+      })
+      const fetchedImage = await fetchedResponse.arrayBuffer()
 
-    res.setHeader('Content-Type', `image/${last(url.split('.'))}`)
-    res.setHeader('Cache-Control', 'max-age=30000')
+      if (!fs.existsSync(cacheDirectory))
+        fs.mkdirSync(cacheDirectory, { recursive: true })
 
-    res.status(200).send(Buffer.from(fetchedImage))
+      fs.writeFileSync(expectedCachePath, Buffer.from(fetchedImage))
+      res.status(200).send(Buffer.from(fetchedImage))
+    }
+
     res.end()
   } catch (e) {
+    console.log(e)
     res.status(500).send('Internal Server Error')
     res.end()
   }
