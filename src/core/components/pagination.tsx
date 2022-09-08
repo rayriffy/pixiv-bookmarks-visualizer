@@ -1,4 +1,4 @@
-import { FunctionComponent, memo } from 'react'
+import { memo } from 'react'
 
 import Link from 'next/link'
 
@@ -21,7 +21,7 @@ const Page = memo<PageProps>(props => {
 
   return (
     <div
-      className={`cursor-pointer ${
+      className={`cursor-pointer p-1 border rounded-md h-full aspect-square text-center ${
         startPoint + i + 1 === current ? 'text-gray-900' : 'text-gray-500'
       }`}
       onClick={() => onChange(startPoint + i + 1)}
@@ -45,11 +45,11 @@ export const Pagination = memo<Props>(props => {
       : 0
 
   return (
-    <div className="flex justify-center py-5">
+    <div className="flex justify-center py-8 space-x-6 sm:space-x-8">
       {Array.from({ length: pageLength }, (_, i) => (
         <div
           key={`pagination-${startPoint + i}`}
-          className="px-4 text-md sm:text-lg"
+          className="text-md sm:text-lg"
         >
           {link ? (
             <Link

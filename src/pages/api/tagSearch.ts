@@ -55,7 +55,7 @@ const api: NextApiHandler = async (req, res) => {
     tags: processedTags.filter(tag =>
       query.length === 0
         ? true
-        : tag.name.original.includes(query) ||
+        : tag.name.original.toLowerCase().includes(query.toLowerCase()) ||
           (tag.name.translated ?? '')
             .toLowerCase()
             .includes(query.toLowerCase())

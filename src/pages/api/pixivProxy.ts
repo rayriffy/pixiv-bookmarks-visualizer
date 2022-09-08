@@ -3,8 +3,6 @@ import path from 'path'
 
 import { NextApiHandler } from 'next'
 
-import { last } from 'lodash'
-
 const cacheDirectory = path.join(process.cwd(), '.next/cache/pixivProxy')
 
 const api: NextApiHandler = async (req, res) => {
@@ -32,7 +30,6 @@ const api: NextApiHandler = async (req, res) => {
 
     res.end()
   } catch (e) {
-    console.log(e)
     res.status(500).send('Internal Server Error')
     res.end()
   }
