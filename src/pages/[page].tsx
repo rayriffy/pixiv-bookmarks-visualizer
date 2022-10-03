@@ -71,8 +71,9 @@ const Page: NextPage = props => {
                     {illust.width} x {illust.height}
                   </span>
                   <img
-                    src={`/api/pixivProxy?${stringify({
+                    src={`/api/${illust.type === 'ugoira' ? 'ugoiraProxy' : 'pixivProxy'}?${stringify({
                       url: illust.image_urls.medium,
+                      illustId: illust.id,
                     })}`}
                     width={illust.width}
                     height={illust.height}

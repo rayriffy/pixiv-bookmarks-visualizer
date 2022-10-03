@@ -30,3 +30,16 @@ With that done, run development server.
 ```
 pnpm next
 ```
+
+Notes for うごイラ illusts
+---
+
+By default this web app will not try to display image as gifs since it take a lot of time to response back. If you want *うごイラ* illusts to be animated run following command to generated (somewhat) highly optimized animated WebP.
+
+```
+node -r @swc-node/register ./tools/ugoria.ts
+```
+
+Also, [`img2webp`](https://developers.google.com/speed/webp/docs/img2webp) is required. Install on your macOS by running `brew install webp`
+
+Script expected to fail multiple times since there's a rate limit on Pixiv API. Wait for about 3-5 minutes for rate limit quota to refill and run the script again until scripts finished without any errors.
