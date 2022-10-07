@@ -5,6 +5,15 @@ Performing complex search with your pixiv bookmarks.
 
 ![](./img/screenshot.jpg)
 
+Features
+---
+
+- Filter illusts by bookmakrs type (Public / Private)
+- Search illust by tags, serch query can be both in Japanese, and English
+- Filter illusts by orientation (Vertical / Horizontal). Great use when looking for new desktop or mobile wallpaper.
+- Filter illusts by minimum pixel resolution on either axis (Width / Height)
+- Actual resolution indicator on top-left corner of each illusts.
+
 How to use?
 ---
 
