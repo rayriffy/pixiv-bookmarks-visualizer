@@ -1,6 +1,7 @@
 lockfileVersion: 5.4
 
 specifiers:
+  '@heroicons/react': ^2.0.12
   '@swc-node/register': ^1.5.2
   '@tailwindcss/forms': ^0.5.3
   '@types/lodash': ^4.14.185
@@ -26,6 +27,7 @@ specifiers:
   typescript: ^4.8.3
 
 dependencies:
+  '@heroicons/react': 2.0.12_react@18.2.0
   dotenv: 16.0.2
   lodash: 4.17.21
   mem: 9.0.2
@@ -386,6 +388,14 @@ packages:
 
   /@emotion/weak-memoize/0.3.0:
     resolution: {integrity: sha512-AHPmaAx+RYfZz0eYu6Gviiagpmiyw98ySSlQvCUhVGDRtDFe4DBS0x1bSjdF3gqUDYOczB+yYvBTtEylYSdRhg==}
+    dev: false
+
+  /@heroicons/react/2.0.12_react@18.2.0:
+    resolution: {integrity: sha512-FZxKh3i9aKIDxyALTgIpSF2t6V6/eZfF5mRu41QlwkX3Oxzecdm1u6dpft6PQGxIBwO7TKYWaMAYYL8mp/EaOg==}
+    peerDependencies:
+      react: '>= 16'
+    dependencies:
+      react: 18.2.0
     dev: false
 
   /@jridgewell/gen-mapping/0.1.1:

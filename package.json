@@ -11,6 +11,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@heroicons/react": "^2.0.12",
     "dotenv": "^16.0.2",
     "lodash": "^4.17.21",
     "mem": "^9.0.2",

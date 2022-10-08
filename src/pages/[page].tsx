@@ -1,13 +1,13 @@
 import { NextPage } from 'next'
 import { useRouter } from 'next/router'
 
-import { stringify } from 'querystring'
 import { useMemo, useContext } from 'react'
 import useSWR from 'swr'
 
 import { buildURLParams } from '../core/services/buildURLParams'
 import { SearchBarContext } from '../context/SearchBarContext'
 import { Pagination } from '../core/components/pagination'
+import { Illust } from '../modules/illust/components/illust'
 
 import { SearchRequest } from '../core/@types/api/SearchRequest'
 import { SearchResult } from '../core/@types/api/SearchResult'
@@ -61,26 +61,7 @@ const Page: NextPage = props => {
           <Pagination {...data.paginate} />
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4 gap-6 items-center">
             {data.illusts.map(illust => (
-              <div key={`illust-${illust.id}`} className="mx-auto relative">
-                <a
-                  href={`https://www.pixiv.net/artworks/${illust.id}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  <span className="absolute bg-black px-1.5 py-0.5 text-xs font-mono text-white opacity-70 z-[1] top-0 left-0">
-                    {illust.width} x {illust.height}
-                  </span>
-                  <img
-                    src={`/api/${illust.type === 'ugoira' ? 'ugoiraProxy' : 'pixivProxy'}?${stringify({
-                      url: illust.image_urls.medium,
-                      illustId: illust.id,
-                    })}`}
-                    width={illust.width}
-                    height={illust.height}
-                    loading="lazy"
-                  />
-                </a>
-              </div>
+              <Illust key={`illust-${illust.id}`} illust={illust} />
             ))}
           </div>
           <Pagination {...data.paginate} />
