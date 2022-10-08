@@ -12,7 +12,7 @@ const bookmarksFilePath = path.join(
   'bookmarks.json'
 )
 
-const queue = new PQueue({ concurrency: 40 })
+const queue = new PQueue({ concurrency: 20 })
 
 ;(async () => {
   const bookmarks = JSON.parse(
@@ -26,13 +26,4 @@ const queue = new PQueue({ concurrency: 40 })
 
     return [mainUrl, ...subUrls]
   }).flat()
-
-  await Promise.allSettled(illustUrls.map(illustUrl => queue.add(async () => {
-    // console.log(path.basename(illustUrl))
-    try {
-      await getPixivImageAndCache(illustUrl)
-    } catch (e) {
-      console.log(path.basename(illustUrl))
-    }
-  })))
 })()
