@@ -1,9 +1,12 @@
 import { FunctionComponent } from 'react'
 
-import { TagSeachBar } from './tag'
+import dynamic from 'next/dynamic'
+
 import { Restriction } from './restriction'
 import { Aspect } from './aspect'
 import { Sizer } from './sizer'
+
+const TagSeachBar = dynamic(() => import('./tag').then(o => o.TagSeachBar))
 
 export const SearchBar: FunctionComponent = () => {
   return (
