@@ -32,7 +32,7 @@ const queue = new PQueue({ concurrency: 40 })
     try {
       await getPixivImageAndCache(illustUrl)
     } catch (e) {
-      console.log(path.basename(illustUrl))
+      console.log(`fail - ${path.basename(illustUrl)}`)
     }
   })))
 })()

@@ -12,5 +12,5 @@ module.exports = withBundleAnalyzer({
       },
     ]
   },
-  output: 'standalone',
+  output: process.env.STANDALONE === 'true' ? 'standalone' : undefined,
 })

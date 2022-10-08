@@ -15,7 +15,7 @@ WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
-RUN yarn global add pnpm && pnpm build
+RUN yarn global add pnpm && STANDALONE=true pnpm build
 
 # If using npm comment out above and use below instead
 # RUN npm run build
