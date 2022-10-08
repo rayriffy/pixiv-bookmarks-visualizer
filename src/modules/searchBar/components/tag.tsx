@@ -60,8 +60,8 @@ export const TagSeachBar = memo(() => {
       styles={{
         menu: provided => ({
           ...provided,
-          zIndex: 10
-        })
+          zIndex: 10,
+        }),
       }}
     />
   )

@@ -45,7 +45,7 @@ export const getPixivImageAndCache = async (url: string) => {
       .toBuffer()
     if (!fs.existsSync(path.dirname(expectedCachePath)))
       fs.mkdirSync(path.dirname(expectedCachePath), {
-        recursive: true
+        recursive: true,
       })
     fs.writeFileSync(expectedCachePath, Buffer.from(optimizedImage))
 

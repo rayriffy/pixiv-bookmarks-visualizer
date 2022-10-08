@@ -13,12 +13,22 @@ const api: NextApiHandler = async (req, res) => {
   try {
     const illustId = req.query.illustId as string
 
-    const expectedCachePath = path.join(ugoiraCacheDirectory, `${illustId}.webp`)
+    const expectedCachePath = path.join(
+      ugoiraCacheDirectory,
+      `${illustId}.webp`
+    )
 
     if (fs.existsSync(path.join(expectedCachePath))) {
       res.status(200).send(Buffer.from(fs.readFileSync(expectedCachePath)))
     } else {
-      const targetUrl = (JSON.parse(fs.readFileSync(path.join(process.cwd(), '.next/cache/bookmarks.json'), 'utf8')) as ExtendedPixivIllust[]).find(o => o.id === Number(illustId)).image_urls.medium
+      const targetUrl = (
+        JSON.parse(
+          fs.readFileSync(
+            path.join(process.cwd(), '.next/cache/bookmarks.json'),
+            'utf8'
+          )
+        ) as ExtendedPixivIllust[]
+      ).find(o => o.id === Number(illustId)).image_urls.medium
       res.status(200).send(await getPixivImageAndCache(targetUrl))
     }
 
