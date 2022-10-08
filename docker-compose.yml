@@ -1,0 +1,13 @@
+version: "3.9"
+
+services:
+  pixiv:
+    container_name: "pixiv-bookmarks-visualizer"
+    volumes:
+      - ./.next/cache:/app/.next/cache
+    ports:
+      - 8081:3000
+    restart: unless-stopped
+    build:
+      context: ./
+      dockerfile: Dockerfile
