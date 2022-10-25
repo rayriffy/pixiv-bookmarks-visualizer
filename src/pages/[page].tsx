@@ -59,7 +59,7 @@ const Page: NextPage = props => {
             </h2>
           </div>
           <Pagination {...data.paginate} />
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4 gap-6 items-center">
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4 gap-x-6 gap-y-12 items-center">
             {data.illusts.map(illust => (
               <Illust key={`illust-${illust.id}`} illust={illust} />
             ))}
