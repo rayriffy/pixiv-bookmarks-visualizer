@@ -45,6 +45,7 @@ export const Illust = memo<Props>(props => {
             width={illust.width}
             height={illust.height}
             loading="lazy"
+            decoding="async"
             className="rounded-lg shadow z-20"
           />
           {slicedImage.map((image, i) => (
