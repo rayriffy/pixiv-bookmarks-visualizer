@@ -7,15 +7,18 @@ import dotenv from 'dotenv'
 
 import { ExtendedPixivIllust } from '../src/core/@types/ExtendedPixivIllust'
 
-const cacheFilePath = path.join(__dirname, '../.next/cache', 'bookmarks.json')
+const cacheDirectory = path.join(__dirname, '../.next/cache')
+const mergedBookmarkPath = path.join(cacheDirectory, 'bookmarks.json')
+const publicBookmarkPath = path.join(cacheDirectory, 'public.json')
+const privateBookmarkPath = path.join(cacheDirectory, 'private.json')
 
 dotenv.config()
-const {
-  PIXIV_USER_ID,
-  PIXIV_REFRESH_TOKEN
-} = process.env
+const { PIXIV_USER_ID, PIXIV_REFRESH_TOKEN } = process.env
 
-const getBookmarks = async (pixiv: Pixiv, restrict: 'public' | 'private'): Promise<ExtendedPixivIllust[]> => {
+const getBookmarks = async (
+  pixiv: Pixiv,
+  restrict: 'public' | 'private'
+): Promise<ExtendedPixivIllust[]> => {
   let bookmarks = await pixiv.user.bookmarksIllust({
     user_id: Number(PIXIV_USER_ID),
     restrict,
@@ -27,16 +30,26 @@ const getBookmarks = async (pixiv: Pixiv, restrict: 'public' | 'private'): Promi
       Number.MAX_SAFE_INTEGER
     )
 
-  return bookmarks.map(o => ({
+  const extendedBookmarks: ExtendedPixivIllust[] = bookmarks.map(o => ({
     ...o,
-    bookmark_private: restrict === 'private'
+    bookmark_private: restrict === 'private',
   }))
+
+  fs.writeFileSync(
+    restrict === 'private' ? privateBookmarkPath : publicBookmarkPath,
+    JSON.stringify(extendedBookmarks, null, 2)
+  )
+
+  return extendedBookmarks
 }
 
 ;(async () => {
-  const pixiv = await Pixiv.refreshLogin(
-    PIXIV_REFRESH_TOKEN
-  )
+  if (!fs.existsSync(path.dirname(cacheDirectory)))
+    fs.mkdirSync(path.dirname(cacheDirectory), {
+      recursive: true,
+    })
+
+  const pixiv = await Pixiv.refreshLogin(PIXIV_REFRESH_TOKEN)
   pixiv.setLanguage('English')
 
   console.log('fetching public bookmarks...')
@@ -44,18 +57,8 @@ const getBookmarks = async (pixiv: Pixiv, restrict: 'public' | 'private'): Promi
   console.log('fetcing private bookmarks...')
   const privateIllust = await getBookmarks(pixiv, 'private')
 
-  // const [publicIllust, privateIllust] = await Promise.all([
-  //   getBookmarks(pixiv, 'public'),
-  //   getBookmarks(pixiv, 'private'),
-  // ])
-
-  if (!fs.existsSync(path.dirname(cacheFilePath)))
-    fs.mkdirSync(path.dirname(cacheFilePath), {
-      recursive: true
-    })
-
   fs.writeFileSync(
-    cacheFilePath,
+    mergedBookmarkPath,
     JSON.stringify(
       reverse(
         sortBy(
@@ -74,6 +77,5 @@ const getBookmarks = async (pixiv: Pixiv, restrict: 'public' | 'private'): Promi
     )
   )
 })().catch(e => {
-  console.log(e)
-  // console.log(e.response.data)
+  console.log(e?.response?.data ?? e)
 })
