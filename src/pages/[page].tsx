@@ -53,9 +53,14 @@ const Page: NextPage = props => {
       ) : (
         <section>
           <div className="my-1">
-            <h2 className="text-sm font-semibold">
-              {(data.count ?? -1).toLocaleString()} images found, with a total
-              of {data.paginate.max.toLocaleString()} pages
+            <h2 className="text-sm">
+              <span className="font-bold">
+                {(data.count ?? -1).toLocaleString()} images
+              </span>{' '}
+              found, with a total of{' '}
+              <span className="font-bold">
+                {data.paginate.max.toLocaleString()} pages
+              </span>
             </h2>
           </div>
           <Pagination {...data.paginate} />

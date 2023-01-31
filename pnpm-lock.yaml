@@ -27,6 +27,7 @@ specifiers:
   swr: ^1.3.0
   tailwindcss: ^3.2.4
   typescript: ^4.8.4
+  web-api-hooks: ^3.0.2
 
 dependencies:
   '@heroicons/react': 2.0.13_react@18.2.0
@@ -45,6 +46,7 @@ dependencies:
   sharp: 0.31.2
   swr: 1.3.0_react@18.2.0
   tailwindcss: 3.2.4_postcss@8.4.19
+  web-api-hooks: 3.0.2_react@18.2.0
 
 devDependencies:
   '@swc-node/register': 1.5.4_r7emt6mtqbrmscxbytuie4leyq
@@ -833,6 +835,10 @@ packages:
       '@types/prop-types': 15.7.5
       '@types/scheduler': 0.16.2
       csstype: 3.1.1
+
+  /@types/resize-observer-browser/0.1.7:
+    resolution: {integrity: sha512-G9eN0Sn0ii9PWQ3Vl72jDPgeJwRWhv2Qk/nQkJuWmRmOB4HX3/BhD5SE1dZs/hzPZL/WKnvF0RHdTSG54QJFyg==}
+    dev: false
 
   /@types/responselike/1.0.0:
     resolution: {integrity: sha512-85Y2BjiufFzaMIlvJDvTTB8Fxl2xfLo4HgmHzVBz08w4wDePCTjYw66PdrolO0kzli3yam/YCgRufyo1DdQVTA==}
@@ -2835,6 +2841,15 @@ packages:
       assert-plus: 1.0.0
       core-util-is: 1.0.2
       extsprintf: 1.3.0
+    dev: false
+
+  /web-api-hooks/3.0.2_react@18.2.0:
+    resolution: {integrity: sha512-EQEGcHo1+FVINg5spKw05lBiN1/LhRK/K2xKnUmuLsLzz4sQK8Bk8qhj4RUgsh4LA7XXZqgJ43aQI+nvtMmIqA==}
+    peerDependencies:
+      react: '>=16.8'
+    dependencies:
+      '@types/resize-observer-browser': 0.1.7
+      react: 18.2.0
     dev: false
 
   /webidl-conversions/3.0.1:

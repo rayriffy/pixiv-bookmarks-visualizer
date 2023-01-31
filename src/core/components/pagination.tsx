@@ -52,17 +52,17 @@ export const Pagination = memo<Props>(props => {
           className="text-md sm:text-lg"
         >
           {link ? (
-            <Link
+            (<Link
               href={startPoint + i === 0 ? '/' : `/${startPoint + i + 1}`}
               aria-label={`${startPoint + i + 1}`}
             >
-              <a>
-                <Page
-                  {...{ startPoint, i, current }}
-                  onChange={page => (onChange ? onChange(page) : null)}
-                />
-              </a>
-            </Link>
+
+              <Page
+                {...{ startPoint, i, current }}
+                onChange={page => (onChange ? onChange(page) : null)}
+              />
+
+            </Link>)
           ) : (
             <Page
               {...{ startPoint, i, current }}
@@ -72,5 +72,5 @@ export const Pagination = memo<Props>(props => {
         </div>
       ))}
     </div>
-  )
+  );
 })
