@@ -44,6 +44,7 @@ const getBookmarks = async (
 }
 
 ;(async () => {
+  console.log(cacheDirectory)
   if (!fs.existsSync(path.dirname(cacheDirectory)))
     fs.mkdirSync(path.dirname(cacheDirectory), {
       recursive: true,
@@ -54,6 +55,10 @@ const getBookmarks = async (
 
   console.log('fetching public bookmarks...')
   const publicIllust = await getBookmarks(pixiv, 'public')
+
+  console.log('cooling down...')
+  await new Promise(res => setTimeout(res, 5000))
+
   console.log('fetcing private bookmarks...')
   const privateIllust = await getBookmarks(pixiv, 'private')
 
