@@ -44,9 +44,8 @@ const getBookmarks = async (
 }
 
 ;(async () => {
-  console.log(cacheDirectory)
-  if (!fs.existsSync(path.dirname(cacheDirectory)))
-    fs.mkdirSync(path.dirname(cacheDirectory), {
+  if (!fs.existsSync(cacheDirectory))
+    fs.mkdirSync(cacheDirectory, {
       recursive: true,
     })
 
