@@ -22,6 +22,9 @@ const bookmarksFilePath = path.join(
 const queue = new PQueue({ concurrency: 20 })
 
 ;(async () => {
+  let failures = []
+  let attempt = 0
+
   const bookmarks = JSON.parse(
     fs.readFileSync(bookmarksFilePath, 'utf8')
   ) as ExtendedPixivIllust[]
@@ -35,54 +38,68 @@ const queue = new PQueue({ concurrency: 20 })
       recursive: true,
     })
 
-  await Promise.allSettled(
-    ugoiras.map(ugoira =>
-      queue.add(async () => {
-        const targetEncodedFile = path.join(
-          ugoiraCacheDirectory,
-          `${ugoira.id}.webp`
-        )
+  while (attempt === 0 || failures.length !== 0) {
+    attempt++
+    failures = []
 
-        if (!fs.existsSync(targetEncodedFile)) {
-          try {
-            const metadataPromise = pixiv.ugoira.metadata({
-              illust_id: ugoira.id,
-            })
-            const downloadedGifPathPromise = pixiv.util.downloadZip(
-              `https://www.pixiv.net/en/artworks/${ugoira.id}`,
-              '.'
-            )
+    console.log(`attempt #${attempt}`)
 
-            const [metadata, downloadedGifPath] = await Promise.all([
-              metadataPromise,
-              downloadedGifPathPromise,
-            ])
-
-            const command = 'img2webp'
-            const inputArgs = metadata.ugoira_metadata.frames
-              .map(frame => [
-                '-d',
-                frame.delay.toString(),
-                '-lossy',
-                '-q',
-                '95',
-                frame.file,
+    await Promise.allSettled(
+      ugoiras.map(ugoira =>
+        queue.add(async () => {
+          const targetEncodedFile = path.join(
+            ugoiraCacheDirectory,
+            `${ugoira.id}.webp`
+          )
+  
+          if (!fs.existsSync(targetEncodedFile)) {
+            try {
+              const metadataPromise = pixiv.ugoira.metadata({
+                illust_id: ugoira.id,
+              })
+              const downloadedGifPathPromise = pixiv.util.downloadZip(
+                `https://www.pixiv.net/en/artworks/${ugoira.id}`,
+                '.'
+              )
+  
+              const [metadata, downloadedGifPath] = await Promise.all([
+                metadataPromise,
+                downloadedGifPathPromise,
               ])
-              .flat()
-            const outputArgs = ['-o', targetEncodedFile]
-
-            await promiseSpawn(command, [...inputArgs, ...outputArgs], {
-              cwd: downloadedGifPath,
-            })
-
-            await fs.promises.rm(downloadedGifPath, {
-              recursive: true,
-            })
-          } catch (e) {
-            console.log(`fail: ${ugoira.id}`)
+  
+              const command = 'img2webp'
+              const inputArgs = metadata.ugoira_metadata.frames
+                .map(frame => [
+                  '-d',
+                  frame.delay.toString(),
+                  '-lossy',
+                  '-q',
+                  '95',
+                  frame.file,
+                ])
+                .flat()
+              const outputArgs = ['-o', targetEncodedFile]
+  
+              await promiseSpawn(command, [...inputArgs, ...outputArgs], {
+                cwd: downloadedGifPath,
+              })
+  
+              await fs.promises.rm(downloadedGifPath, {
+                recursive: true,
+              })
+            } catch (e) {
+              failures.push(ugoira.id)
+              // console.log(`fail: ${ugoira.id}`)
+            }
           }
-        }
-      })
+        })
+      )
     )
-  )
+
+    console.log(`attempt #${attempt} - ${failures.length} failures`)
+    if (failures.length !== 0) {
+      console.log('cooling down...')
+      await new Promise(res => setTimeout(res, 2 * 60000))
+    }
+  }
 })()
