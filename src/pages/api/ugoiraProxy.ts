@@ -2,6 +2,7 @@ import fs from 'fs'
 import path from 'path'
 
 import { NextApiHandler } from 'next'
+import destr from 'destr'
 
 import { getPixivImageAndCache } from '../../core/services/getPixivImageAndCache'
 
@@ -19,11 +20,11 @@ const api: NextApiHandler = async (req, res) => {
     )
 
     if (fs.existsSync(path.join(expectedCachePath))) {
-      res.status(200).send(Buffer.from(fs.readFileSync(expectedCachePath)))
+      res.status(200).send(Buffer.from(await fs.promises.readFile(expectedCachePath)))
     } else {
       const targetUrl = (
-        JSON.parse(
-          fs.readFileSync(
+        destr(
+          await fs.promises.readFile(
             path.join(process.cwd(), '.next/cache/bookmarks.json'),
             'utf8'
           )

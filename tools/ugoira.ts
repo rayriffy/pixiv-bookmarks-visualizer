@@ -1,6 +1,7 @@
 import fs from 'fs'
 import path from 'path'
 
+import destr from 'destr'
 import PQueue from 'p-queue'
 
 import Pixiv from 'pixiv.ts'
@@ -25,8 +26,8 @@ const queue = new PQueue({ concurrency: 20 })
   let failures = []
   let attempt = 0
 
-  const bookmarks = JSON.parse(
-    fs.readFileSync(bookmarksFilePath, 'utf8')
+  const bookmarks = destr(
+    await fs.promises.readFile(bookmarksFilePath, 'utf8')
   ) as ExtendedPixivIllust[]
   const ugoiras = bookmarks.filter(o => o.type === 'ugoira')
 
@@ -34,7 +35,7 @@ const queue = new PQueue({ concurrency: 20 })
   pixiv.setLanguage('English')
 
   if (!fs.existsSync(ugoiraCacheDirectory))
-    fs.mkdirSync(ugoiraCacheDirectory, {
+    await fs.promises.mkdir(ugoiraCacheDirectory, {
       recursive: true,
     })
 
@@ -96,8 +97,8 @@ const queue = new PQueue({ concurrency: 20 })
       )
     )
 
-    console.log(`attempt #${attempt} - ${failures.length} failures`)
     if (failures.length !== 0) {
+      console.log(`attempt #${attempt} - ${failures.length} failures`)
       console.log('cooling down...')
       await new Promise(res => setTimeout(res, 2 * 60000))
     }
