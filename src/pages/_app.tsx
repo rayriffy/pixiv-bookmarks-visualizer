@@ -4,6 +4,8 @@ import { NextPage } from 'next'
 import { AppProps } from 'next/app'
 import Head from 'next/head'
 
+import { SWRConfig } from 'swr'
+
 import { SearchBarContext } from '../context/SearchBarContext'
 import { minimumSizer } from '../context/defaults/minimumSizer'
 import { SearchBar } from '../modules/searchBar/components'
@@ -21,7 +23,11 @@ const App: NextPage<AppProps> = props => {
   const minimumSizerState = useState<MinimumSizer>(minimumSizer)
 
   return (
-    <Fragment>
+    <SWRConfig 
+      value={{
+        fetcher: (resource, init) => fetch(resource, init).then(res => res.json())
+      }}
+    >
       <Head>
         <title>Pixiv bookmark visualizer</title>
       </Head>
@@ -38,7 +44,7 @@ const App: NextPage<AppProps> = props => {
           <Component {...pageProps} />
         </main>
       </SearchBarContext.Provider>
-    </Fragment>
+    </SWRConfig>
   )
 }
 

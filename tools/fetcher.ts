@@ -17,35 +17,47 @@ const { PIXIV_USER_ID, PIXIV_REFRESH_TOKEN } = process.env
 
 const getBookmarks = async (
   pixiv: Pixiv,
-  restrict: 'public' | 'private'
+  restrict: 'public' | 'private',
+  attempt = 1
 ): Promise<ExtendedPixivIllust[]> => {
-  let bookmarks = await pixiv.user.bookmarksIllust({
-    user_id: Number(PIXIV_USER_ID),
-    restrict,
-    en: true,
-  })
-  if (pixiv.user.nextURL)
-    bookmarks = await pixiv.util.multiCall(
-      { next_url: pixiv.user.nextURL, illusts: bookmarks },
-      Number.MAX_SAFE_INTEGER
+  try {
+    let bookmarks = await pixiv.user.bookmarksIllust({
+      user_id: Number(PIXIV_USER_ID),
+      restrict,
+      en: true,
+    })
+    if (pixiv.user.nextURL)
+      bookmarks = await pixiv.util.multiCall(
+        { next_url: pixiv.user.nextURL, illusts: bookmarks },
+        Number.MAX_SAFE_INTEGER
+      )
+
+    const extendedBookmarks: ExtendedPixivIllust[] = bookmarks.map(o => ({
+      ...o,
+      bookmark_private: restrict === 'private',
+    }))
+
+    await fs.promises.writeFile(
+      restrict === 'private' ? privateBookmarkPath : publicBookmarkPath,
+      JSON.stringify(extendedBookmarks, null, 2)
     )
 
-  const extendedBookmarks: ExtendedPixivIllust[] = bookmarks.map(o => ({
-    ...o,
-    bookmark_private: restrict === 'private',
-  }))
+    return extendedBookmarks
+  } catch (e) {
+    if (attempt < 5) {
+      console.log(`performing attempt #${attempt} in ${attempt} minute...`)
+      await new Promise(o => setTimeout(o, (attempt * 60000) + 1000))
 
-  fs.writeFileSync(
-    restrict === 'private' ? privateBookmarkPath : publicBookmarkPath,
-    JSON.stringify(extendedBookmarks, null, 2)
-  )
-
-  return extendedBookmarks
+      return getBookmarks(pixiv, restrict, attempt + 1)
+    } else {
+      throw e
+    }
+  }
 }
 
 ;(async () => {
   if (!fs.existsSync(cacheDirectory))
-    fs.mkdirSync(cacheDirectory, {
+    await fs.promises.mkdir(cacheDirectory, {
       recursive: true,
     })
 
@@ -61,7 +73,7 @@ const getBookmarks = async (
   console.log('fetcing private bookmarks...')
   const privateIllust = await getBookmarks(pixiv, 'private')
 
-  fs.writeFileSync(
+  await fs.promises.writeFile(
     mergedBookmarkPath,
     JSON.stringify(
       reverse(

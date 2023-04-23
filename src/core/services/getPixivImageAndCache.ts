@@ -2,7 +2,6 @@ import fs from 'fs'
 import path from 'path'
 
 import sharp from 'sharp'
-import fetch from 'node-fetch'
 
 const cacheDirectory = path.join(process.cwd(), '.next/cache/pixivProxy')
 
@@ -25,7 +24,7 @@ export const getPixivImageAndCache = async (url: string) => {
     : path.join(cacheDirectory, expectedCacheFileName)
 
   if (fs.existsSync(path.join(expectedCachePath))) {
-    return Buffer.from(fs.readFileSync(expectedCachePath))
+    return Buffer.from(await fs.promises.readFile(expectedCachePath))
   } else {
     const fetchedResponse = await fetch(url, {
       headers: {
@@ -35,7 +34,7 @@ export const getPixivImageAndCache = async (url: string) => {
     const fetchedImage = await fetchedResponse.arrayBuffer()
 
     if (!fs.existsSync(cacheDirectory))
-      fs.mkdirSync(cacheDirectory, { recursive: true })
+      await fs.promises.mkdir(cacheDirectory, { recursive: true })
 
     const optimizedImage = await sharp(Buffer.from(fetchedImage))
       .webp({
@@ -44,10 +43,10 @@ export const getPixivImageAndCache = async (url: string) => {
       })
       .toBuffer()
     if (!fs.existsSync(path.dirname(expectedCachePath)))
-      fs.mkdirSync(path.dirname(expectedCachePath), {
+      await fs.promises.mkdir(path.dirname(expectedCachePath), {
         recursive: true,
       })
-    fs.writeFileSync(expectedCachePath, Buffer.from(optimizedImage))
+    await fs.promises.writeFile(expectedCachePath, Buffer.from(optimizedImage))
 
     return Buffer.from(optimizedImage)
   }

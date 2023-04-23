@@ -5,6 +5,7 @@ import { getIllusts } from '../../core/services/getIllusts'
 
 import { SearchRequest } from '../../core/@types/api/SearchRequest'
 import { SearchResult } from '../../core/@types/api/SearchResult'
+import { supporterFilter } from '../../core/services/supporterFilter'
 
 const api: NextApiHandler = async (req, res) => {
   const illusts = await getIllusts()
@@ -50,6 +51,7 @@ const api: NextApiHandler = async (req, res) => {
         ? true
         : searchTags.every(tag => illust.tags.map(o => o.name).includes(tag))
     )
+    // .filter(supporterFilter)
 
   const illustChunks = chunk(filteredIllusts, 30)
 

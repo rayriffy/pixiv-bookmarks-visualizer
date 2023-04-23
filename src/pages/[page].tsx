@@ -40,8 +40,7 @@ const Page: NextPage = props => {
   )
 
   const { data, error } = useSWR<SearchResult, any, string>(
-    `/api/search?${buildURLParams(searchPayload)}`,
-    (...args) => fetch(...args).then(res => res.json())
+    `/api/search?${buildURLParams(searchPayload)}`
   )
 
   return (

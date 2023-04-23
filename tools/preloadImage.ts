@@ -1,6 +1,7 @@
 import fs from 'fs'
 import path from 'path'
 
+import destr from 'destr'
 import PQueue from 'p-queue'
 
 import { ExtendedPixivIllust } from '../src/core/@types/ExtendedPixivIllust'
@@ -15,8 +16,8 @@ const bookmarksFilePath = path.join(
 const queue = new PQueue({ concurrency: 40 })
 
 ;(async () => {
-  const bookmarks = JSON.parse(
-    fs.readFileSync(bookmarksFilePath, 'utf8')
+  const bookmarks = destr(
+    await fs.promises.readFile(bookmarksFilePath, 'utf8')
   ) as ExtendedPixivIllust[]
 
   // get all urls
