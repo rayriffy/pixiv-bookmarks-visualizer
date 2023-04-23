@@ -5,11 +5,32 @@ import { useHover } from 'web-api-hooks'
 import { RectangleStackIcon } from '@heroicons/react/24/solid'
 import { ExtendedPixivIllust } from '../../../core/@types/ExtendedPixivIllust'
 import { getOptimizedIllustUrl } from '../services/getOptimizedIllustUrl'
-import Link from 'next/link'
 
 interface Props {
   illust: ExtendedPixivIllust
 }
+
+const FrontImage = memo<Props>(props => {
+  const { illust } = props
+
+  const [isHovered, bindHover] = useHover()
+
+  return (
+    <img
+      src={getOptimizedIllustUrl(
+        illust.id,
+        isHovered && illust.type === 'ugoira' ? illust.type : '',
+        illust.image_urls.medium
+      )}
+      width={illust.width}
+      height={illust.height}
+      loading="lazy"
+      decoding="async"
+      className="rounded-lg shadow z-20"
+      {...bindHover}
+    />
+  )
+})
 
 export const Illust = memo<Props>(props => {
   const { illust } = props
@@ -25,7 +46,11 @@ export const Illust = memo<Props>(props => {
 
   return (
     <div className="mx-auto relative">
-      <a href={`https://www.pixiv.net/artworks/${illust.id}`}>
+      <a
+        href={`https://www.pixiv.net/artworks/${illust.id}`}
+        target="_blank"
+        rel="noopener noreferer"
+      >
         <span className="absolute bg-black/70 px-2 py-0.5 text-xs font-mono text-white z-[4] rounded-full top-1 left-1">
           {illust.width} x {illust.height}
         </span>
@@ -36,26 +61,26 @@ export const Illust = memo<Props>(props => {
         </span>
       )}
       <div className="relative">
-        <img
-          src={getOptimizedIllustUrl(
-            illust.id,
-            illust.type,
-            illust.image_urls.medium
-          )}
-          width={illust.width}
-          height={illust.height}
-          loading="lazy"
-          decoding="async"
-          className="rounded-lg shadow z-20"
-        />
-        {slicedImage.map((image, i) => (
+        {illust.type === 'ugoira' ? (
+          <FrontImage {...props} />
+        ) : (
           <img
-            key={`sub-illust${illust.id}-${i}`}
             src={getOptimizedIllustUrl(
               illust.id,
               illust.type,
-              image.image_urls.medium
+              illust.image_urls.medium
             )}
+            width={illust.width}
+            height={illust.height}
+            loading="lazy"
+            decoding="async"
+            className="rounded-lg shadow z-20"
+          />
+        )}
+        {slicedImage.map((image, i) => (
+          <img
+            key={`sub-illust${illust.id}-${i}`}
+            src={getOptimizedIllustUrl(illust.id, '', image.image_urls.medium)}
             width={illust.width}
             height={illust.height}
             className={`absolute h-auto left-0 right-0 mx-auto rounded-lg ${
