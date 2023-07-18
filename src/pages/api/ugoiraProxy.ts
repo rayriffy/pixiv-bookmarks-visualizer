@@ -23,13 +23,13 @@ const api: NextApiHandler = async (req, res) => {
       res.status(200).send(Buffer.from(await fs.promises.readFile(expectedCachePath)))
     } else {
       const targetUrl = (
-        destr(
+        destr<ExtendedPixivIllust[]>(
           await fs.promises.readFile(
             path.join(process.cwd(), '.next/cache/bookmarks.json'),
             'utf8'
           )
-        ) as ExtendedPixivIllust[]
-      ).find(o => o.id === Number(illustId)).image_urls.medium
+        )
+      ).find(o => o.id === Number(illustId))!.image_urls.medium
       res.status(200).send(await getPixivImageAndCache(targetUrl))
     }
 

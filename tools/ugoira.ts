@@ -23,7 +23,7 @@ const bookmarksFilePath = path.join(
 const queue = new PQueue({ concurrency: 20 })
 
 ;(async () => {
-  let failures = []
+  let failures: number[] = []
   let attempt = 0
 
   const bookmarks = destr(
@@ -31,7 +31,7 @@ const queue = new PQueue({ concurrency: 20 })
   ) as ExtendedPixivIllust[]
   const ugoiras = bookmarks.filter(o => o.type === 'ugoira')
 
-  const pixiv = await Pixiv.refreshLogin(PIXIV_REFRESH_TOKEN)
+  const pixiv = await Pixiv.refreshLogin(PIXIV_REFRESH_TOKEN!)
   pixiv.setLanguage('English')
 
   if (!fs.existsSync(ugoiraCacheDirectory))
