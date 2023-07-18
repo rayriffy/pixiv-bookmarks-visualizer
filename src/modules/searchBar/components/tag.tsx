@@ -43,6 +43,7 @@ export const TagSeachBar = memo(() => {
       }))
     } catch (e) {
       console.error(e)
+      return []
     } finally {
       setLoading(false)
     }
