@@ -31,8 +31,8 @@ const api: NextApiHandler = async (req, res) => {
     .filter(illustTags =>
       transformedSelectedTags.length === 0
         ? true
-        : transformedSelectedTags.every(selectedTag =>
-            illustTags.map(o => o.name).includes(selectedTag)
+        : !transformedSelectedTags.some(selectedTag =>
+            illustTags.every(o => o.name !== selectedTag)
           )
     )
     .flat()
