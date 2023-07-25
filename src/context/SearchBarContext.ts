@@ -11,6 +11,7 @@ interface Context {
   restriction: ReactState<'all' | 'public' | 'private'>
   aspect: ReactState<'all' | 'horizontal' | 'vertical'>
   minimumSizer: ReactState<MinimumSizer>
+  blur: ReactState<boolean>
 }
 
 export const SearchBarContext = createContext<Context>({
@@ -18,4 +19,5 @@ export const SearchBarContext = createContext<Context>({
   restriction: ['public', () => {}],
   aspect: ['all', () => {}],
   minimumSizer: [minimumSizer, () => {}],
+  blur: [true, () => {}],
 })

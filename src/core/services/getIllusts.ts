@@ -16,6 +16,6 @@ export const getIllusts = mem(
     )
   },
   {
-    maxAge: 2 * 60 * 1000,
+    maxAge: 1,
   }
 )

@@ -14,11 +14,13 @@
   "license": "ISC",
   "dependencies": {
     "@heroicons/react": "^2.0.18",
+    "@nanostores/react": "^0.7.1",
     "@next/bundle-analyzer": "^13.4.10",
     "destr": "^2.0.0",
     "dotenv": "^16.3.1",
     "lodash": "^4.17.21",
     "mem": "^9.0.2",
+    "nanostores": "^0.9.3",
     "next": "13.4.10",
     "pixiv.ts": "npm:@rayriffy/pixiv.ts@^0.5.11",
     "postcss": "^8.4.26",
@@ -38,7 +40,7 @@
     "@types/node": "^20.4.2",
     "@types/react": "^18.2.15",
     "@types/react-dom": "^18.2.7",
-    "p-queue": "7.3.4",
+    "p-queue": "6.6.2",
     "prettier": "^3.0.0",
     "typescript": "^5.1.6"
   }

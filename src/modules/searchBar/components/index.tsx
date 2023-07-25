@@ -5,6 +5,7 @@ import dynamic from 'next/dynamic'
 import { Restriction } from './restriction'
 import { Aspect } from './aspect'
 import { Sizer } from './sizer'
+import { Checks } from './checks'
 
 const TagSeachBar = dynamic(() => import('./tag').then(o => o.TagSeachBar))
 
@@ -15,6 +16,7 @@ export const SearchBar: FunctionComponent = () => {
         <Restriction />
         <Aspect />
         <Sizer />
+        <Checks />
       </div>
       <TagSeachBar />
     </div>

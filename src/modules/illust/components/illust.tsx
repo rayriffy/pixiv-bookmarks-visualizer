@@ -1,10 +1,12 @@
-import { memo, useEffect, useMemo } from 'react'
+import { memo, useContext, useEffect, useMemo } from 'react'
 
 import { useHover } from 'web-api-hooks'
 
 import { RectangleStackIcon } from '@heroicons/react/24/solid'
 import { ExtendedPixivIllust } from '../../../core/@types/ExtendedPixivIllust'
 import { getOptimizedIllustUrl } from '../services/getOptimizedIllustUrl'
+import { SearchBarContext } from '../../../context/SearchBarContext'
+import { classNames } from '../../../core/components/classNames'
 
 interface Props {
   illust: ExtendedPixivIllust
@@ -38,14 +40,14 @@ export const Illust = memo<Props>(props => {
   const illustSize = useMemo(() => illust.meta_pages.length, [])
   const slicedImage = useMemo(() => illust.meta_pages.slice(1, 3), [])
 
-  useEffect(() => {
-    if (slicedImage.length !== 0) {
-      console.log(slicedImage)
-    }
-  }, [])
+  const searchBarContext = useContext(SearchBarContext)
+  const isBlur = useMemo(
+    () => (illust.bookmark_private || illust.tags.some(tag => tag.name === 'R-18') && searchBarContext.blur[0]),
+    [searchBarContext.blur[0]]
+  )
 
   return (
-    <div className="mx-auto relative">
+    <div className="mx-auto relative overflow-hidden">
       <a
         href={`https://www.pixiv.net/artworks/${illust.id}`}
         target="_blank"
@@ -60,7 +62,12 @@ export const Illust = memo<Props>(props => {
           <RectangleStackIcon className="w-4 h-4 mr-1" /> {illustSize}
         </span>
       )}
-      <div className="relative">
+      <div
+        className={classNames(
+          'relative overflow-hidden',
+          isBlur ? 'blur-xl' : ''
+        )}
+      >
         {illust.type === 'ugoira' ? (
           <FrontImage {...props} />
         ) : (
