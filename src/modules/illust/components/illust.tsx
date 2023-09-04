@@ -42,7 +42,10 @@ export const Illust = memo<Props>(props => {
 
   const searchBarContext = useContext(SearchBarContext)
   const isBlur = useMemo(
-    () => (illust.bookmark_private || illust.tags.some(tag => tag.name === 'R-18') && searchBarContext.blur[0]),
+    () =>
+      (illust.bookmark_private ||
+        illust.tags.some(tag => tag.name === 'R-18')) &&
+      searchBarContext.blur[0],
     [searchBarContext.blur[0]]
   )
 
