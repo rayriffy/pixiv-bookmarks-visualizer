@@ -20,7 +20,7 @@ const bookmarksFilePath = path.join(
   'bookmarks.json'
 )
 
-const queue = new PQueue({ concurrency: 20 })
+const queue = new PQueue({ concurrency: 10 })
 
 ;(async () => {
   let failures: number[] = []
@@ -52,22 +52,51 @@ const queue = new PQueue({ concurrency: 20 })
             ugoiraCacheDirectory,
             `${ugoira.id}.webp`
           )
-  
+
           if (!fs.existsSync(targetEncodedFile)) {
             try {
-              const metadataPromise = pixiv.ugoira.metadata({
+              const metadata = await pixiv.ugoira.metadata({
                 illust_id: ugoira.id,
+                r18: true,
+                restrict: 'private',
               })
-              const downloadedGifPathPromise = pixiv.util.downloadZip(
-                `https://www.pixiv.net/en/artworks/${ugoira.id}`,
-                '.'
+
+              const fileName = path.basename(
+                metadata.ugoira_metadata.zip_urls.medium
               )
-  
-              const [metadata, downloadedGifPath] = await Promise.all([
-                metadataPromise,
-                downloadedGifPathPromise,
-              ])
-  
+              const fetchedZip = await fetch(
+                metadata.ugoira_metadata.zip_urls.medium,
+                {
+                  method: 'GET',
+                  headers: {
+                    Referer: 'https://www.pixiv.net/',
+                  },
+                }
+              )
+                .then(o => o.arrayBuffer())
+                .then(o => Buffer.from(o))
+
+              const targetExtractPath = path.join(__dirname, '.cache', 'ugoira')
+              const targetZipPath = path.join(targetExtractPath, fileName)
+              const targetUgoiraDirPath = path.join(
+                targetExtractPath,
+                ugoira.id.toString()
+              )
+
+              if (!fs.existsSync(targetExtractPath))
+                fs.mkdirSync(targetExtractPath, {
+                  recursive: true,
+                })
+
+              await fs.writeFileSync(targetZipPath, fetchedZip)
+              await promiseSpawn(
+                'unzip',
+                ['-d', ugoira.id.toString(), fileName],
+                {
+                  cwd: targetExtractPath,
+                }
+              )
+
               const command = 'img2webp'
               const inputArgs = metadata.ugoira_metadata.frames
                 .map(frame => [
@@ -80,17 +109,20 @@ const queue = new PQueue({ concurrency: 20 })
                 ])
                 .flat()
               const outputArgs = ['-o', targetEncodedFile]
-  
+
               await promiseSpawn(command, [...inputArgs, ...outputArgs], {
-                cwd: downloadedGifPath,
+                cwd: targetUgoiraDirPath,
               })
-  
-              await fs.promises.rm(downloadedGifPath, {
-                recursive: true,
-              })
+
+              await Promise.all([
+                fs.promises.rm(targetUgoiraDirPath, {
+                  recursive: true,
+                }),
+                fs.promises.rm(targetZipPath),
+              ])
             } catch (e) {
               failures.push(ugoira.id)
-              // console.log(`fail: ${ugoira.id}`)
+              console.log(`fail: ${ugoira.id}`)
             }
           }
         })
