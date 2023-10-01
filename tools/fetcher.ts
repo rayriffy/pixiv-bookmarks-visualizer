@@ -46,7 +46,7 @@ const getBookmarks = async (
   } catch (e) {
     if (attempt < 5) {
       console.log(`performing attempt #${attempt} in ${attempt} minute...`)
-      await new Promise(o => setTimeout(o, (attempt * 60000) + 1000))
+      await new Promise(o => setTimeout(o, attempt * 60000 + 1000))
 
       return getBookmarks(pixiv, restrict, attempt + 1)
     } else {
@@ -83,6 +83,7 @@ const getBookmarks = async (
               ![
                 'https://s.pximg.net/common/images/limit_mypixiv_360.png',
                 'https://s.pximg.net/common/images/limit_unknown_360.png',
+                'https://s.pximg.net/common/images/limit_sanity_level_360.png',
               ].includes(o.image_urls.medium)
           ),
           ['create_date']
