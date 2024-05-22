@@ -1,7 +1,7 @@
 import fs from 'fs'
 import path from 'path'
 
-import Pixiv from 'pixiv.ts'
+import Pixiv, { PixivMultiCall } from 'pixiv.ts'
 import { sortBy, reverse } from 'lodash'
 import dotenv from 'dotenv'
 
@@ -21,28 +21,77 @@ const getBookmarks = async (
   attempt = 1
 ): Promise<ExtendedPixivIllust[]> => {
   try {
+    const bookmarkPath =
+      restrict === 'private' ? privateBookmarkPath : publicBookmarkPath
+    // read existing cache
+    let existingCache: ExtendedPixivIllust[] = []
+
+    if (fs.existsSync(bookmarkPath)) {
+      existingCache = JSON.parse(
+        await fs.promises.readFile(bookmarkPath, 'utf-8')
+      ) as ExtendedPixivIllust[]
+    }
+
+    const existingCacheIds = existingCache.map(o => o.id)
+
     let bookmarks = await pixiv.user.bookmarksIllust({
       user_id: Number(PIXIV_USER_ID),
       restrict,
       en: true,
     })
-    if (pixiv.user.nextURL)
-      bookmarks = await pixiv.util.multiCall(
-        { next_url: pixiv.user.nextURL, illusts: bookmarks },
-        Number.MAX_SAFE_INTEGER
-      )
 
-    const extendedBookmarks: ExtendedPixivIllust[] = bookmarks.map(o => ({
-      ...o,
-      bookmark_private: restrict === 'private',
-    }))
+    let nextUrl: string | null = pixiv.user.nextURL
+    let prevDupPercentage = 0
+    let page = 1
+    while (nextUrl !== null) {
+      page++
+      console.log(`page: ${page}, prevDup: ${prevDupPercentage.toFixed(2)}%`)
+
+      const response: PixivMultiCall = await pixiv.api.next(nextUrl)
+      nextUrl = response.next_url
+
+      // append to existing cache
+      bookmarks = bookmarks.concat(...(response.illusts ?? []))
+
+      // calculate duplication
+      let ids = response.illusts?.map(i => i.id) ?? []
+      let dupPercentage =
+        (ids.filter(i => existingCacheIds.includes(i)).length * 100) /
+        ids.length
+
+      if (dupPercentage > 90) {
+        console.log(
+          `duplication percentage is too high, breaking... (${dupPercentage.toFixed(2)}%)`
+        )
+        break
+      } else {
+        await new Promise(o => setTimeout(o, 1000))
+      }
+    }
+
+    const extendedBookmarksToAppend: ExtendedPixivIllust[] = bookmarks
+      // remove duplicates
+      .filter(o => !existingCacheIds.includes(o.id))
+      // make it ExtendedPixivIllust
+      .map(o => ({
+        ...o,
+        bookmark_private: restrict === 'private',
+      }))
+
+    console.log('bookmarks: ', bookmarks.length)
+    console.log('toAppend: ', extendedBookmarksToAppend.length)
+    console.log('existingCache: ', existingCache.length)
+
+    const mergedIllust = existingCache.concat(...extendedBookmarksToAppend)
+
+    console.log('mergedIllust: ', mergedIllust.length)
 
     await fs.promises.writeFile(
       restrict === 'private' ? privateBookmarkPath : publicBookmarkPath,
-      JSON.stringify(extendedBookmarks, null, 2)
+      JSON.stringify(mergedIllust, null, 2)
     )
 
-    return extendedBookmarks
+    return mergedIllust
   } catch (e) {
     if (attempt < 5) {
       console.log(`performing attempt #${attempt} in ${attempt} minute...`)
@@ -70,7 +119,7 @@ const getBookmarks = async (
   console.log('cooling down...')
   await new Promise(res => setTimeout(res, 5000))
 
-  console.log('fetcing private bookmarks...')
+  console.log('fetching private bookmarks...')
   const privateIllust = await getBookmarks(pixiv, 'private')
 
   await fs.promises.writeFile(
