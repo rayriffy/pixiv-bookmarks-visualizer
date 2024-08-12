@@ -84,7 +84,7 @@ export const Illust = memo<Props>(props => {
             height={illust.height}
             loading="lazy"
             decoding="async"
-            className="rounded-lg shadow z-20"
+            className="rounded-lg shadow z-20 max-h-[600px] object-cover"
           />
         )}
         {slicedImage.map((image, i) => (
@@ -93,7 +93,7 @@ export const Illust = memo<Props>(props => {
             src={getOptimizedIllustUrl(illust.id, '', image.image_urls.medium)}
             width={illust.width}
             height={illust.height}
-            className={`absolute h-auto left-0 right-0 mx-auto rounded-lg ${
+            className={`absolute h-auto left-0 right-0 mx-auto rounded-lg max-h-[600px] object-cover ${
               i === 0
                 ? '-bottom-2 -z-10 w-11/12 shadow-lg'
                 : '-bottom-4 -z-20 w-10/12 shadow-xl'
