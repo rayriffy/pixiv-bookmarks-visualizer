@@ -22,7 +22,7 @@ const Page = memo<PageProps>(props => {
   return (
     <div
       className={`cursor-pointer p-1 border rounded-md h-full aspect-square text-center ${
-        startPoint + i + 1 === current ? 'text-gray-900' : 'text-gray-500'
+        startPoint + i + 1 === current ? 'text-white-900' : 'text-gray-500'
       }`}
       onClick={() => onChange(startPoint + i + 1)}
     >

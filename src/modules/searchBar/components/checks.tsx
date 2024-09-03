@@ -20,7 +20,7 @@ export const Checks = memo(() => {
         />
       </div>
       <div className="ml-3 text-sm leading-6">
-        <label htmlFor="blur" className="font-medium text-gray-900">
+        <label htmlFor="blur" className="font-medium text-white-900">
           SFW Mode
         </label>
       </div>

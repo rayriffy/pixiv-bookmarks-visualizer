@@ -59,9 +59,40 @@ export const TagSeachBar = memo(() => {
         MenuList: WindowedMenuList,
       }}
       styles={{
-        menu: provided => ({
+        control: (provided) => ({
           ...provided,
+          backgroundColor: 'hsl(0deg 0% 7.06%)', // Dark background for the control
+          borderColor: 'hsl(0, 0%, 20%)', // Optional: Change border color if needed
+        }),
+        menu: (provided) => ({
+          ...provided,
+          backgroundColor: 'hsl(0deg 0% 7.06%)', // Dark background for the dropdown menu
           zIndex: 10,
+        }),
+        option: (provided, state) => ({
+          ...provided,
+          backgroundColor: state.isSelected ? 'hsl(0deg 0% 15%)' : 'hsl(0deg 0% 7.06%)', // Dark background for options
+          color: state.isSelected ? 'white' : 'gray', // Change text color if needed
+        }),
+        singleValue: (provided) => ({
+          ...provided,
+          color: 'white', // Text color of the selected value
+        }),
+        placeholder: (provided) => ({
+          ...provided,
+          color: 'gray', // Placeholder text color
+        }),
+        indicatorSeparator: (provided) => ({
+          ...provided,
+          backgroundColor: 'transparent', // Hide separator if needed
+        }),
+        dropdownIndicator: (provided) => ({
+          ...provided,
+          color: 'white', // Dropdown indicator color
+        }),
+		input: (provided) => ({
+          ...provided,
+          color: 'white', // Text color when typing
         }),
       }}
     />
