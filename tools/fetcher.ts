@@ -111,7 +111,6 @@ const getBookmarks = async (
     })
 
   const pixiv = await Pixiv.refreshLogin(PIXIV_REFRESH_TOKEN!)
-  pixiv.setLanguage('English')
 
   console.log('fetching public bookmarks...')
   const publicIllust = await getBookmarks(pixiv, 'public')

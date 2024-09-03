@@ -32,7 +32,6 @@ const queue = new PQueue({ concurrency: 10 })
   const ugoiras = bookmarks.filter(o => o.type === 'ugoira')
 
   const pixiv = await Pixiv.refreshLogin(PIXIV_REFRESH_TOKEN!)
-  pixiv.setLanguage('English')
 
   if (!fs.existsSync(ugoiraCacheDirectory))
     await fs.promises.mkdir(ugoiraCacheDirectory, {

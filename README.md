@@ -48,7 +48,7 @@ Notes for うごイラ illusts
 By default this web app will not try to display image as gifs since it take a lot of time to response back. If you want *うごイラ* illusts to be animated run following command to generated (somewhat) highly optimized animated WebP.
 
 ```
-node -r @swc-node/register ./tools/ugoria.ts
+node -r @swc-node/register ./tools/ugoira.ts
 ```
 
 Also, [`img2webp`](https://developers.google.com/speed/webp/docs/img2webp) is required. Install on your macOS by running `brew install webp`
