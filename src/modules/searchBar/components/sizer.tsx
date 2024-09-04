@@ -74,7 +74,8 @@ export const Sizer = memo(() => {
           type="text"
           value={input}
           onChange={onChange}
-          className="form-input block w-full rounded-r-md border-gray-300 pr-12 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm text-gray-500 bg-dark-bg hover:bg-dark-bg-inactive"
+          className="form-input block w-full rounded-r-md border-gray-300 pr-12 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm text-gray-500 hover:bg-dark-bg-inactive"
+		      style={{ backgroundColor: 'var(--bg-dark-bg)' }} // Override the default white background CSS that's written by tailwind form module.
         />
         <div className="absolute inset-y-0 right-0 flex py-1.5 pr-1.5">
           <kbd className="inline-flex items-center rounded border border-gray-200 px-2 font-sans text-sm font-medium text-gray-500 bg-dark-bg hover:bg-dark-bg-inactive">
