@@ -6,6 +6,8 @@ import { Restriction } from './restriction'
 import { Aspect } from './aspect'
 import { Sizer } from './sizer'
 import { Checks } from './checks'
+import { PageCount } from './pageCount'
+import { AiMode } from './ai'
 
 const TagSeachBar = dynamic(() => import('./tag').then(o => o.TagSeachBar))
 
@@ -16,7 +18,9 @@ export const SearchBar: FunctionComponent = () => {
         <Restriction />
         <Aspect />
         <Sizer />
+        <AiMode />
         <Checks />
+        <PageCount />
       </div>
       <TagSeachBar />
     </div>

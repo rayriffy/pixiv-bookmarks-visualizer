@@ -17,10 +17,14 @@ const Page: NextPage = props => {
 
   // Context
   const searchBarContext = useContext(SearchBarContext)
-  const [tags] = searchBarContext.tags
+  const [includeTags] = searchBarContext.includeTags
+  const [excludeTags] = searchBarContext.excludeTags
   const [restrict] = searchBarContext.restriction
   const [aspect] = searchBarContext.aspect
   const [minimumSizer] = searchBarContext.minimumSizer
+  const [aiMode] = searchBarContext.aiMode
+  const [minimumPageCount] = searchBarContext.minimumPageCount
+  const [maximumPageCount] = searchBarContext.maximumPageCount
 
   const pageNumber = useMemo(
     () => (query.page === undefined ? 1 : Number(query.page as string)),
@@ -30,13 +34,17 @@ const Page: NextPage = props => {
   const searchPayload = useMemo<SearchRequest>(
     () => ({
       page: pageNumber.toString(),
-      tags,
+      includeTags: includeTags,
+      excludeTags: excludeTags,
       restrict,
       aspect,
       sizerMode: minimumSizer.mode,
       sizerSize: minimumSizer.size.toString(),
+      aiMode: aiMode,
+      minimumPageCount: minimumPageCount,
+      maximumPageCount: maximumPageCount,
     }),
-    [pageNumber, tags, restrict, aspect, minimumSizer.mode, minimumSizer.size]
+    [pageNumber, includeTags, excludeTags, restrict, aspect, minimumSizer.mode, minimumSizer.size, aiMode, minimumPageCount, maximumPageCount]
   )
 
   const { data, error } = useSWR<SearchResult, any, string>(

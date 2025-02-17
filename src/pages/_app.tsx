@@ -17,11 +17,15 @@ import '../styles/tailwind.css'
 const App: NextPage<AppProps> = props => {
   const { Component, pageProps } = props
 
-  const tagState = useState<string[]>([])
+  const includedTagsState = useState<string[]>([])
+  const excludedTagsState = useState<string[]>([])
   const restrictState = useState<'all' | 'public' | 'private'>('public')
   const aspectState = useState<'all' | 'horizontal' | 'vertical'>('all')
   const minimumSizerState = useState<MinimumSizer>(minimumSizer)
   const blurState = useState<boolean>(false)
+  const ai = useState<'all' | 'non-ai-only' | 'ai-only'>('all')
+  const minimumPageCount = useState<string>('0')
+  const maximumPageCount = useState<string>('0')
 
   return (
     <SWRConfig 
@@ -34,11 +38,15 @@ const App: NextPage<AppProps> = props => {
       </Head>
       <SearchBarContext.Provider
         value={{
-          tags: tagState,
+          includeTags: includedTagsState,
+          excludeTags: excludedTagsState,
           restriction: restrictState,
           aspect: aspectState,
           minimumSizer: minimumSizerState,
           blur: blurState,
+          aiMode: ai,
+          minimumPageCount: minimumPageCount,
+          maximumPageCount: maximumPageCount,
         }}
       >
         <main className="max-w-7xl mx-auto px-4 py-8">
