@@ -33,7 +33,7 @@ export const PageCount = memo(() => {
             value={minimumPageCount}
             onChange={onMinimumValueChange}
             type="number"
-            className="max-width:10px rounded border-gray-300 text-indigo-600 focus:ring-indigo-600"
+            className="max-width-[30px] rounded border-gray-300 text-indigo-600 focus:ring-indigo-600"
           />
         </div>
         <div>
@@ -46,7 +46,7 @@ export const PageCount = memo(() => {
             value={maximumPageCount}
             onChange={onMaximumValueChange}
             type="number"
-            className="max-width:10px rounded border-gray-300 text-indigo-600 focus:ring-indigo-600"
+            className="max-width-[30px] rounded border-gray-300 text-indigo-600 focus:ring-indigo-600"
           />
         </div>
       </div>

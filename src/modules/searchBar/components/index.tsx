@@ -8,6 +8,7 @@ import { Sizer } from './sizer'
 import { Checks } from './checks'
 import { PageCount } from './pageCount'
 import { AiMode } from './ai'
+import TagCount from './tagCounts'
 
 const TagSeachBar = dynamic(() => import('./tag').then(o => o.TagSeachBar))
 
@@ -23,6 +24,7 @@ export const SearchBar: FunctionComponent = () => {
         <PageCount />
       </div>
       <TagSeachBar />
+      <TagCount />
     </div>
   )
 }

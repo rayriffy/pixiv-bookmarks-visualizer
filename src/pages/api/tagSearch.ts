@@ -23,8 +23,8 @@ const api: NextApiHandler = async (req, res) => {
     selectedTags === undefined
       ? []
       : typeof selectedTags === 'string'
-      ? [selectedTags]
-      : selectedTags
+        ? [selectedTags]
+        : selectedTags
 
   const searchedTags = illusts
     .map(o => o.tags)
@@ -32,8 +32,8 @@ const api: NextApiHandler = async (req, res) => {
       transformedSelectedTags.length === 0
         ? true
         : !transformedSelectedTags.some(selectedTag =>
-            illustTags.every(o => o.name !== selectedTag)
-          )
+          illustTags.every(o => o.name !== selectedTag)
+        )
     )
     .flat()
   const processedTags: NumberizedTag[] = reverse(
@@ -53,12 +53,12 @@ const api: NextApiHandler = async (req, res) => {
 
   const payload: TagSearchResponse = {
     tags: processedTags.filter(tag =>
-      query.length === 0
+      query === undefined || query.length === 0
         ? true
         : tag.name.original.toLowerCase().includes(query.toLowerCase()) ||
-          (tag.name.translated ?? '')
-            .toLowerCase()
-            .includes(query.toLowerCase())
+        (tag.name.translated ?? '')
+          .toLowerCase()
+          .includes(query.toLowerCase())
     ),
   }
 
