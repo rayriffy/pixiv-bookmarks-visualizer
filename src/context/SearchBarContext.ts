@@ -36,3 +36,33 @@ export const SearchBarContext = createContext<Context>({
   minimumPageCount: ['0', () => { }],
   maximumPageCount: ['0', () => { }],
 })
+
+// Utility function to update tag counts based on top tags data
+export function updateTagCounts(
+  existingTags: TagItem[], 
+  topTags: { name: { original: string, translated: string | null }, count: number }[]
+): TagItem[] {
+  // Create a map of tag counts from top tags for quick lookup
+  const tagCountMap = new Map<string, { count: number, translated: string | null }>();
+  
+  topTags.forEach(tag => {
+    tagCountMap.set(tag.name.original, { 
+      count: tag.count,
+      translated: tag.name.translated
+    });
+  });
+  
+  // Update existing tags with new counts if available
+  return existingTags.map(tag => {
+    const updatedInfo = tagCountMap.get(tag.name);
+    if (updatedInfo) {
+      return {
+        ...tag,
+        count: updatedInfo.count,
+        // Only update the translation if it's not already set or if the new one is available
+        translated: tag.translated || updatedInfo.translated
+      };
+    }
+    return tag;
+  });
+}

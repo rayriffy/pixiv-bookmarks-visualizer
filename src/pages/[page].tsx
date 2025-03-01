@@ -1,11 +1,11 @@
 import { NextPage } from 'next'
 import { useRouter } from 'next/router'
 
-import { useMemo, useContext } from 'react'
+import { useMemo, useContext, useEffect } from 'react'
 import useSWR from 'swr'
 
 import { buildURLParams } from '../core/services/buildURLParams'
-import { SearchBarContext, TagItem } from '../context/SearchBarContext'
+import { SearchBarContext, TagItem, updateTagCounts } from '../context/SearchBarContext'
 import { Pagination } from '../core/components/pagination'
 import { Illust } from '../modules/illust/components/Illust'
 
@@ -22,8 +22,8 @@ const Page: NextPage = props => {
 
   // Context
   const searchBarContext = useContext(SearchBarContext)
-  const [includeTags] = searchBarContext.includeTags
-  const [excludeTags] = searchBarContext.excludeTags
+  const [includeTags, setIncludeTags] = searchBarContext.includeTags
+  const [excludeTags, setExcludeTags] = searchBarContext.excludeTags
   const [restrict] = searchBarContext.restriction
   const [aspect] = searchBarContext.aspect
   const [minimumSizer] = searchBarContext.minimumSizer
@@ -62,6 +62,23 @@ const Page: NextPage = props => {
   const { data: topTagsResponse, error: topTagsError } = useSWR<{ tags: Tag[] }, any, string>(
     `/api/topTags?${buildURLParams(searchPayload)}`
   )
+  
+  // Update tag counts when top tags data changes
+  useEffect(() => {
+    if (topTagsResponse?.tags && topTagsResponse.tags.length > 0) {
+      // Update include tags counts
+      if (includeTags.length > 0) {
+        const updatedIncludeTags = updateTagCounts(includeTags, topTagsResponse.tags);
+        setIncludeTags(updatedIncludeTags);
+      }
+      
+      // Update exclude tags counts
+      if (excludeTags.length > 0) {
+        const updatedExcludeTags = updateTagCounts(excludeTags, topTagsResponse.tags);
+        setExcludeTags(updatedExcludeTags);
+      }
+    }
+  }, [topTagsResponse, includeTags, excludeTags, setIncludeTags, setExcludeTags]);
 
   return (
     <main className={"p-4"}>
