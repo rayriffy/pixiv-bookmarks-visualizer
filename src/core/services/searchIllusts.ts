@@ -1,55 +1,14 @@
-import { SQL, and, asc, count, desc, eq, gt, gte, inArray, isNotNull, isNull, like, lt, lte, ne, not, or, sql } from 'drizzle-orm'
-import { ExtendedPixivIllust } from '../@types/ExtendedPixivIllust'
+import { SQL, and, count, desc, eq, gte, inArray, lte, ne, sql } from 'drizzle-orm'
 import { SearchRequest } from '../@types/api/SearchRequest'
 import { getDbClient } from '../../db/connect'
 import { illustTagsTable, illustUsersTable, illustsTable, tagsTable, usersTable } from '../../db/schema'
 import { MinimumSizer } from '../@types/MinimumSizer'
-import { Tag } from '../@types/api/TagSearchResponse'
-
-// Helper to convert DB records to ExtendedPixivIllust objects
-function dbResultToPixivIllust(result: any): ExtendedPixivIllust {
-  const illust = result.illusts
-
-  return {
-    id: illust.id,
-    title: illust.title,
-    type: illust.type,
-    caption: illust.caption,
-    create_date: illust.create_date,
-    page_count: illust.page_count,
-    width: illust.width,
-    height: illust.height,
-    sanity_level: illust.sanity_level,
-    total_view: illust.total_view,
-    total_bookmarks: illust.total_bookmarks,
-    is_bookmarked: illust.is_bookmarked,
-    visible: illust.visible,
-    x_restrict: illust.x_restrict,
-    is_muted: illust.is_muted,
-    total_comments: illust.total_comments,
-    illust_ai_type: illust.illust_ai_type,
-    illust_book_style: illust.illust_book_style,
-    restrict: illust.restrict,
-    bookmark_private: illust.bookmark_private,
-    image_urls: JSON.parse(illust.image_urls),
-    meta_single_page: JSON.parse(illust.meta_single_page),
-    meta_pages: JSON.parse(illust.meta_pages),
-    tools: JSON.parse(illust.tools),
-    url: illust.url,
-    user: {
-      id: result.users.id,
-      name: result.users.name,
-      account: result.users.account,
-      profile_image_urls: JSON.parse(result.users.profile_image_urls),
-      is_followed: result.users.is_followed,
-      comment: '',
-    },
-    tags: result.tags.map((tag: any) => ({
-      name: tag.name,
-      translated_name: tag.translated_name
-    })),
-  }
-}
+import {
+  dbResultToPixivIllust,
+  groupTagsByIllustId,
+  convertToTagResponse,
+  mapUsersByIllustId,
+} from './dbUtils'
 
 export async function searchIllusts(searchRequest: SearchRequest) {
   const db = getDbClient()
@@ -236,10 +195,7 @@ export async function searchIllusts(searchRequest: SearchRequest) {
     .where(inArray(illustUsersTable.illust_id, illustIds))
 
   // Map users to illusts
-  const usersByIllustId = new Map()
-  userResults.forEach(result => {
-    usersByIllustId.set(result.illust_id, result.users)
-  })
+  const usersByIllustId = mapUsersByIllustId(userResults)
 
   // Get tags for these illusts
   const tagResults = await db
@@ -252,12 +208,7 @@ export async function searchIllusts(searchRequest: SearchRequest) {
     .where(inArray(illustTagsTable.illust_id, illustIds))
 
   // Group tags by illust
-  const tagsByIllustId = new Map<number, any[]>()
-  tagResults.forEach(result => {
-    const tags = tagsByIllustId.get(result.illust_id) || []
-    tags.push(result.tag)
-    tagsByIllustId.set(result.illust_id, tags)
-  })
+  const tagsByIllustId = groupTagsByIllustId(tagResults)
 
   // Combine all the data into ExtendedPixivIllust format
   const illusts = results.map(result => {
@@ -287,16 +238,7 @@ export async function searchIllusts(searchRequest: SearchRequest) {
   })
 
   // 3. Convert to expected Tag format and sort by count
-  const relatedTags: Tag[] = Array.from(tagCounts.values())
-    .map(({ tag, count }) => ({
-      name: {
-        original: tag.name,
-        translated: tag.translated_name,
-      },
-      count
-    }))
-    .sort((a, b) => b.count - a.count)
-    .slice(0, 10) // Top 10 related tags
+  const relatedTags = convertToTagResponse(tagCounts, 10)
 
   // Construct the final result with pagination
   return {

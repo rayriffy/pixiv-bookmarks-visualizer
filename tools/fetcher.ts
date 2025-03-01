@@ -1,6 +1,3 @@
-import fs from 'fs/promises'
-import path from 'path'
-
 import Pixiv, { PixivMultiCall } from 'pixiv.ts'
 import dotenv from 'dotenv'
 import { createClient } from '@libsql/client'
