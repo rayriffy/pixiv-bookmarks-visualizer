@@ -1,6 +1,6 @@
 import { Tag } from '../../../core/@types/api/TagSearchResponse'
 import { memo, useContext, useMemo } from 'react'
-import { SearchBarContext } from '../../../context/SearchBarContext'
+import { SearchBarContext, TagItem } from '../../../context/SearchBarContext'
 
 interface Props {
   tags: Tag[]
@@ -11,19 +11,32 @@ export const TopTags = memo<Props>(({ tags }) => {
   const [includeTags, setIncludeTags] = searchBarContext.includeTags
   const [excludeTags] = searchBarContext.excludeTags
 
-  // Add a tag to the search filter
-  const addTagToSearch = (tagName: string) => {
-    // Avoid adding duplicates
-    if (!includeTags.includes(tagName)) {
-      setIncludeTags(prev => [...prev, tagName])
+  // Add a tag to the search filter with complete information
+  const addTagToSearch = (tag: Tag) => {
+    // Avoid adding duplicates - check if tag name already exists
+    const nameExists = includeTags.some(t => t.name === tag.name.original)
+    
+    if (!nameExists) {
+      // Add complete tag information
+      setIncludeTags(prev => [
+        ...prev, 
+        {
+          name: tag.name.original, 
+          translated: tag.name.translated,
+          count: tag.count
+        }
+      ])
     }
   }
 
   // Filter out tags that are already in includeTags or excludeTags
   const filteredTags = useMemo(() => {
+    const includeTagNames = includeTags.map(t => t.name)
+    const excludeTagNames = excludeTags.map(t => t.name)
+    
     return tags.filter(tag => 
-      !includeTags.includes(tag.name.original) && 
-      !excludeTags.includes(tag.name.original)
+      !includeTagNames.includes(tag.name.original) && 
+      !excludeTagNames.includes(tag.name.original)
     )
   }, [tags, includeTags, excludeTags])
 
@@ -43,7 +56,7 @@ export const TopTags = memo<Props>(({ tags }) => {
             <p
               key={`tag-${tag.name.original}`}
               className={"bg-base-300 px-2 py-1 cursor-pointer hover:bg-base-200 transition-colors"}
-              onClick={() => addTagToSearch(tag.name.original)}
+              onClick={() => addTagToSearch(tag)}
               title="Click to add to search filters"
             >
               <span className={"text-base-content"}>

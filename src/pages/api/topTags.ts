@@ -111,7 +111,7 @@ const api: NextApiHandler = async (req, res) => {
         
         // Process in batches if there are too many illusts
         const batchSize = 1000
-        const batches = []
+        const batches: number[][] = []
         
         for (let i = 0; i < allIllustIds.length; i += batchSize) {
           batches.push(allIllustIds.slice(i, i + batchSize))
@@ -175,7 +175,7 @@ const api: NextApiHandler = async (req, res) => {
         
         // If we have target illusts from include tags
         if (targetIllustIds !== null) {
-          const batches = []
+          const batches: number[][] = []
           for (let i = 0; i < targetIllustIds.length; i += batchSize) {
             batches.push(targetIllustIds.slice(i, i + batchSize))
           }
@@ -217,7 +217,7 @@ const api: NextApiHandler = async (req, res) => {
           }
           
           // Process in batches
-          const batches = []
+          const batches: number[][] = []
           for (let i = 0; i < allIllustIds.length; i += batchSize) {
             batches.push(allIllustIds.slice(i, i + batchSize))
           }
@@ -264,7 +264,7 @@ const api: NextApiHandler = async (req, res) => {
     // Now that we have the filtered illust IDs, get the top 10 tags
     // Process in batches to avoid too many SQL parameters
     const batchSize = 1000
-    const batches = []
+    const batches: number[][] = []
     
     for (let i = 0; i < targetIllustIds.length; i += batchSize) {
       batches.push(targetIllustIds.slice(i, i + batchSize))

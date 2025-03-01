@@ -6,9 +6,16 @@ import { MinimumSizer } from '../core/@types/MinimumSizer'
 
 type ReactState<S = any> = [S, Dispatch<SetStateAction<S>>]
 
+// Define a TagItem interface for storing both the name and metadata
+export interface TagItem {
+  name: string;
+  translated?: string | null;
+  count?: number;
+}
+
 interface Context {
-  includeTags: ReactState<string[]>
-  excludeTags: ReactState<string[]>
+  includeTags: ReactState<TagItem[]>
+  excludeTags: ReactState<TagItem[]>
   restriction: ReactState<'all' | 'public' | 'private'>
   aspect: ReactState<'all' | 'horizontal' | 'vertical'>
   minimumSizer: ReactState<MinimumSizer>

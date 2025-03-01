@@ -6,7 +6,7 @@ import Head from 'next/head'
 
 import { SWRConfig } from 'swr'
 
-import { SearchBarContext } from '../context/SearchBarContext'
+import { SearchBarContext, TagItem } from '../context/SearchBarContext'
 import { minimumSizer } from '../context/defaults/minimumSizer'
 import { MinimumSizer } from '../core/@types/MinimumSizer'
 import '../styles/tailwind.css'
@@ -14,8 +14,8 @@ import '../styles/tailwind.css'
 const App: NextPage<AppProps> = props => {
   const { Component, pageProps } = props
 
-  const includedTagsState = useState<string[]>([])
-  const excludedTagsState = useState<string[]>([])
+  const includedTagsState = useState<TagItem[]>([])
+  const excludedTagsState = useState<TagItem[]>([])
   const restrictState = useState<'all' | 'public' | 'private'>('public')
   const aspectState = useState<'all' | 'horizontal' | 'vertical'>('all')
   const minimumSizerState = useState<MinimumSizer>(minimumSizer)

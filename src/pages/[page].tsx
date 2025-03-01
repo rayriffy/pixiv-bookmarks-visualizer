@@ -5,7 +5,7 @@ import { useMemo, useContext } from 'react'
 import useSWR from 'swr'
 
 import { buildURLParams } from '../core/services/buildURLParams'
-import { SearchBarContext } from '../context/SearchBarContext'
+import { SearchBarContext, TagItem } from '../context/SearchBarContext'
 import { Pagination } from '../core/components/pagination'
 import { Illust } from '../modules/illust/components/Illust'
 
@@ -36,11 +36,15 @@ const Page: NextPage = props => {
     [query]
   )
 
+  // Extract just the tag names for the API request
+  const includeTagNames = useMemo(() => includeTags.map(tag => tag.name), [includeTags])
+  const excludeTagNames = useMemo(() => excludeTags.map(tag => tag.name), [excludeTags])
+
   const searchPayload = useMemo<SearchRequest>(
     () => ({
       page: pageNumber.toString(),
-      includeTags: includeTags,
-      excludeTags: excludeTags,
+      includeTags: includeTagNames,
+      excludeTags: excludeTagNames,
       restrict,
       aspect,
       sizerMode: minimumSizer.mode,
@@ -49,7 +53,7 @@ const Page: NextPage = props => {
       minimumPageCount: minimumPageCount,
       maximumPageCount: maximumPageCount,
     }),
-    [pageNumber, includeTags, excludeTags, restrict, aspect, minimumSizer.mode, minimumSizer.size, aiMode, minimumPageCount, maximumPageCount]
+    [pageNumber, includeTagNames, excludeTagNames, restrict, aspect, minimumSizer.mode, minimumSizer.size, aiMode, minimumPageCount, maximumPageCount]
   )
 
   const { data, error } = useSWR<SearchResult, any, string>(

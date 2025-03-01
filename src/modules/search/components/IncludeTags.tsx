@@ -1,7 +1,7 @@
 import Async from 'react-select/async'
 import { WindowedMenuList } from 'react-windowed-select'
 import { useContext, useState } from 'react'
-import { SearchBarContext } from '../../../context/SearchBarContext'
+import { SearchBarContext, TagItem } from '../../../context/SearchBarContext'
 import { TagSearchRequest } from '../../../core/@types/api/TagSearchRequest'
 import { TagSearchResponse } from '../../../core/@types/api/TagSearchResponse'
 import { buildURLParams } from '../../../core/services/buildURLParams'
@@ -19,7 +19,7 @@ export const IncludeTags = () => {
 
       const tagSearchPayload: TagSearchRequest = {
         query: inputValue,
-        selectedTags: tags,
+        selectedTags: tags.map(t => t.name), // Use just the names for the API
       }
 
       const expectedResults: TagSearchResponse = await fetch(
@@ -27,7 +27,11 @@ export const IncludeTags = () => {
       ).then(o => o.json())
 
       return expectedResults.tags.map(tag => ({
-        value: tag.name.original,
+        value: {
+          name: tag.name.original,
+          translated: tag.name.translated,
+          count: tag.count
+        } as TagItem,
         label: <TagSearchItem {...tag} />,
       }))
     } catch (e) {
@@ -41,7 +45,13 @@ export const IncludeTags = () => {
   // Create the value object for react-select
   const selectValue = tags.map(tag => ({
     value: tag,
-    label: <TagSearchItem name={{ original: tag, translated: null }} count={0} />
+    label: <TagSearchItem 
+      name={{ 
+        original: tag.name, 
+        translated: tag.translated || null 
+      }} 
+      count={tag.count || 0} 
+    />
   }))
 
   return (
@@ -52,7 +62,7 @@ export const IncludeTags = () => {
         value={selectValue}
         loadOptions={includedTagLoadOptions}
         isLoading={loading}
-        onChange={val => setTags(val.map(o => o.value))}
+        onChange={val => setTags(val.map(o => o.value as TagItem))}
         components={{
           MenuList: WindowedMenuList,
         }}
