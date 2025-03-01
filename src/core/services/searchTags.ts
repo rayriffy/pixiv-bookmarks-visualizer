@@ -119,7 +119,15 @@ export async function searchTags(
           sql`lower(${tagsTable.translated_name}) like ${lowerQuery}`
         )
         
-        tagQuery = tagQuery.where(whereClause)
+        // Need to rebuild the query with the additional where clause
+        return db
+          .select({
+            id: tagsTable.id,
+            name: tagsTable.name,
+            translated_name: tagsTable.translated_name,
+          })
+          .from(tagsTable)
+          .where(and(inArray(tagsTable.id, batchIds), whereClause))
       }
       
       return tagQuery.execute()
@@ -180,9 +188,10 @@ export async function searchTags(
   })
   
   // Convert to array and sort by count
+  const limit = request.limit ? Number(request.limit) : 20;
   const tags = Array.from(uniqueTags.values())
     .sort((a, b) => b.count - a.count)
-    .slice(0, request.limit ? Number(request.limit) : 20) // Apply limit early
+    .slice(0, limit) // Apply limit early
   
   return { tags }
 }
