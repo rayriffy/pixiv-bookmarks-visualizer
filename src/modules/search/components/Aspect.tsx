@@ -1,4 +1,4 @@
-import { ChangeEvent, useContext, useEffect, useState } from 'react'
+import { type ChangeEvent, useContext, useEffect, useState } from 'react'
 import { SearchBarContext } from '../../../context/SearchBarContext'
 
 export const Aspect = () => {
@@ -8,12 +8,12 @@ export const Aspect = () => {
   const searchBarContext = useContext(SearchBarContext)
   const [_, setAspect] = searchBarContext.aspect
 
-  const handleClick = (variant: 'horizontal' | 'vertical') => (event: ChangeEvent<HTMLInputElement>) => {
-    if (variant === 'horizontal')
-      setToggleHorizontal(event.target.checked)
-    else
-      setToggleVertical(event.target.checked)
-  }
+  const handleClick =
+    (variant: 'horizontal' | 'vertical') =>
+    (event: ChangeEvent<HTMLInputElement>) => {
+      if (variant === 'horizontal') setToggleHorizontal(event.target.checked)
+      else setToggleVertical(event.target.checked)
+    }
 
   useEffect(() => {
     const selectedMode =
@@ -28,13 +28,23 @@ export const Aspect = () => {
   return (
     <>
       <label className="fieldset-label">Orientation</label>
-      <div className={"flex gap-4"}>
+      <div className={'flex gap-4'}>
         <label className="fieldset-label">
-          <input type="checkbox" className="checkbox" checked={toggleHorizontal} onChange={handleClick('horizontal')} />
+          <input
+            type="checkbox"
+            className="checkbox"
+            checked={toggleHorizontal}
+            onChange={handleClick('horizontal')}
+          />
           Horizontal
         </label>
         <label className="fieldset-label">
-          <input type="checkbox" className="checkbox" checked={toggleVertical} onChange={handleClick('vertical')} />
+          <input
+            type="checkbox"
+            className="checkbox"
+            checked={toggleVertical}
+            onChange={handleClick('vertical')}
+          />
           Vertical
         </label>
       </div>

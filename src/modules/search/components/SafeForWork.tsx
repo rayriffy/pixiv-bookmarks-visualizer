@@ -15,7 +15,8 @@ export const SafeForWork = () => {
           onChange={e => {
             setBlur(e.target.checked)
           }}
-          className="toggle" />
+          className="toggle"
+        />
         SFW mode
       </label>
     </>

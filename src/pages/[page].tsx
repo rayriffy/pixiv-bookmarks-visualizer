@@ -1,21 +1,23 @@
-import { NextPage } from 'next'
+import type { NextPage } from 'next'
 import { useRouter } from 'next/router'
 
 import { useMemo, useContext, useEffect } from 'react'
 import useSWR from 'swr'
 
 import { buildURLParams } from '../core/services/buildURLParams'
-import { SearchBarContext, TagItem, updateTagCounts } from '../context/SearchBarContext'
+import {
+  SearchBarContext,
+  TagItem,
+  updateTagCounts,
+} from '../context/SearchBarContext'
 import { Pagination } from '../core/components/pagination'
 import { Illust } from '../modules/illust/components/Illust'
 
-import { SearchRequest } from '../core/@types/api/SearchRequest'
-import { SearchResult } from '../core/@types/api/SearchResult'
-import {
-  SearchFilters
-} from '../modules/search/components/SearchFilters'
+import type { SearchRequest } from '../core/@types/api/SearchRequest'
+import type { SearchResult } from '../core/@types/api/SearchResult'
+import { SearchFilters } from '../modules/search/components/SearchFilters'
 import { TopTags } from '../modules/topTags/component/TopTags'
-import { Tag } from '../core/@types/api/TagSearchResponse'
+import type { Tag } from '../core/@types/api/TagSearchResponse'
 
 const Page: NextPage = props => {
   const { query } = useRouter()
@@ -37,8 +39,14 @@ const Page: NextPage = props => {
   )
 
   // Extract just the tag names for the API request
-  const includeTagNames = useMemo(() => includeTags.map(tag => tag.name), [includeTags])
-  const excludeTagNames = useMemo(() => excludeTags.map(tag => tag.name), [excludeTags])
+  const includeTagNames = useMemo(
+    () => includeTags.map(tag => tag.name),
+    [includeTags]
+  )
+  const excludeTagNames = useMemo(
+    () => excludeTags.map(tag => tag.name),
+    [excludeTags]
+  )
 
   const searchPayload = useMemo<SearchRequest>(
     () => ({
@@ -53,34 +61,47 @@ const Page: NextPage = props => {
       minimumPageCount: minimumPageCount,
       maximumPageCount: maximumPageCount,
     }),
-    [pageNumber, includeTagNames, excludeTagNames, restrict, aspect, minimumSizer.mode, minimumSizer.size, aiMode, minimumPageCount, maximumPageCount]
+    [
+      pageNumber,
+      includeTagNames,
+      excludeTagNames,
+      restrict,
+      aspect,
+      minimumSizer.mode,
+      minimumSizer.size,
+      aiMode,
+      minimumPageCount,
+      maximumPageCount,
+    ]
   )
 
   const { data, error } = useSWR<SearchResult, any, string>(
     `/api/search?${buildURLParams(searchPayload)}`
   )
-  const { data: topTagsResponse, error: topTagsError } = useSWR<{ tags: Tag[] }, any, string>(
-    `/api/topTags?${buildURLParams(searchPayload)}`
-  )
-  
+  const { data: topTagsResponse, error: topTagsError } = useSWR<
+    { tags: Tag[] },
+    any,
+    string
+  >(`/api/topTags?${buildURLParams(searchPayload)}`)
+
   // Update tag counts when top tags data changes
   useEffect(() => {
     if (topTagsResponse?.tags && topTagsResponse.tags.length > 0) {
       // Update include tags counts - use functional update to avoid closure issues
       if (includeTags.length > 0) {
-        setIncludeTags(prev => updateTagCounts(prev, topTagsResponse.tags));
+        setIncludeTags(prev => updateTagCounts(prev, topTagsResponse.tags))
       }
-      
+
       // Update exclude tags counts - use functional update to avoid closure issues
       if (excludeTags.length > 0) {
-        setExcludeTags(prev => updateTagCounts(prev, topTagsResponse.tags));
+        setExcludeTags(prev => updateTagCounts(prev, topTagsResponse.tags))
       }
     }
-  }, [topTagsResponse, setIncludeTags, setExcludeTags]);
+  }, [topTagsResponse, setIncludeTags, setExcludeTags])
 
   return (
-    <main className={"p-4"}>
-      <section className={"grid md:grid-cols-2 lg:grid-cols-4 gap-4"}>
+    <main className={'p-4'}>
+      <section className={'grid md:grid-cols-2 lg:grid-cols-4 gap-4'}>
         <SearchFilters />
         <TopTags tags={topTagsResponse?.tags ?? []} />
       </section>
@@ -93,22 +114,22 @@ const Page: NextPage = props => {
           <section>
             <div className="my-1">
               <h2 className="text-sm">
-              <span className="font-bold">
-                {(data!.count ?? -1).toLocaleString()} images
-              </span>{' '}
+                <span className="font-bold">
+                  {(data?.count ?? -1).toLocaleString()} images
+                </span>{' '}
                 found, with a total of{' '}
                 <span className="font-bold">
-                {data!.paginate.max.toLocaleString()} pages
-              </span>
+                  {data?.paginate.max.toLocaleString()} pages
+                </span>
               </h2>
             </div>
-            <Pagination {...data!.paginate} />
+            <Pagination {...data?.paginate} />
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-x-6 gap-y-12 items-center">
-              {data!.illusts.map(illust => (
+              {data?.illusts.map(illust => (
                 <Illust key={`illust-${illust.id}`} illust={illust} />
               ))}
             </div>
-            <Pagination {...data!.paginate} />
+            <Pagination {...data?.paginate} />
           </section>
         )}
       </div>

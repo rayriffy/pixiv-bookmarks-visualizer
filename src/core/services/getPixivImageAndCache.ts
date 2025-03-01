@@ -1,5 +1,5 @@
-import fs from 'fs'
-import path from 'path'
+import fs from 'node:fs'
+import path from 'node:path'
 
 import sharp from 'sharp'
 
@@ -25,29 +25,28 @@ export const getPixivImageAndCache = async (url: string) => {
 
   if (fs.existsSync(path.join(expectedCachePath))) {
     return Buffer.from(await fs.promises.readFile(expectedCachePath))
-  } else {
-    const fetchedResponse = await fetch(url, {
-      headers: {
-        referer: 'https://www.pixiv.net/',
-      },
-    })
-    const fetchedImage = await fetchedResponse.arrayBuffer()
-
-    if (!fs.existsSync(cacheDirectory))
-      await fs.promises.mkdir(cacheDirectory, { recursive: true })
-
-    const optimizedImage = await sharp(Buffer.from(fetchedImage))
-      .webp({
-        quality: 85,
-        effort: 6,
-      })
-      .toBuffer()
-    if (!fs.existsSync(path.dirname(expectedCachePath)))
-      await fs.promises.mkdir(path.dirname(expectedCachePath), {
-        recursive: true,
-      })
-    await fs.promises.writeFile(expectedCachePath, Buffer.from(optimizedImage))
-
-    return Buffer.from(optimizedImage)
   }
+  const fetchedResponse = await fetch(url, {
+    headers: {
+      referer: 'https://www.pixiv.net/',
+    },
+  })
+  const fetchedImage = await fetchedResponse.arrayBuffer()
+
+  if (!fs.existsSync(cacheDirectory))
+    await fs.promises.mkdir(cacheDirectory, { recursive: true })
+
+  const optimizedImage = await sharp(Buffer.from(fetchedImage))
+    .webp({
+      quality: 85,
+      effort: 6,
+    })
+    .toBuffer()
+  if (!fs.existsSync(path.dirname(expectedCachePath)))
+    await fs.promises.mkdir(path.dirname(expectedCachePath), {
+      recursive: true,
+    })
+  await fs.promises.writeFile(expectedCachePath, Buffer.from(optimizedImage))
+
+  return Buffer.from(optimizedImage)
 }

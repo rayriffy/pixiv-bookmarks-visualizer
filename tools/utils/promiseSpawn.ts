@@ -1,4 +1,4 @@
-import { spawn, SpawnOptions } from 'child_process'
+import { spawn, type SpawnOptions } from 'node:child_process'
 
 export const promiseSpawn = (
   cmd: string,

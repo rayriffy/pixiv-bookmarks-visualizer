@@ -1,4 +1,3 @@
-
 export interface Tag {
   name: {
     original: string
@@ -6,7 +5,6 @@ export interface Tag {
   }
   count: number
 }
-
 
 export interface TagSearchResponse {
   tags: Tag[]

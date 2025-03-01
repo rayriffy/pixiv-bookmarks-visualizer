@@ -1,5 +1,5 @@
-import { ExtendedPixivIllust } from '../@types/ExtendedPixivIllust'
-import { Tag } from '../@types/api/TagSearchResponse'
+import type { ExtendedPixivIllust } from '../@types/ExtendedPixivIllust'
+import type { Tag } from '../@types/api/TagSearchResponse'
 
 // SQLite parameters limit
 export const SQLITE_PARAMS_LIMIT = 500
@@ -46,7 +46,7 @@ export function dbResultToPixivIllust(result: any): ExtendedPixivIllust {
     },
     tags: result.tags.map((tag: any) => ({
       name: tag.name,
-      translated_name: tag.translated_name
+      translated_name: tag.translated_name,
     })),
   }
 }
@@ -59,42 +59,46 @@ export async function batchedQuery<T>(
   queryFn: (ids: number[]) => Promise<T[]>
 ): Promise<T[]> {
   let allResults: T[] = []
-  
+
   for (let i = 0; i < idArray.length; i += SQLITE_PARAMS_LIMIT) {
     const batchIds = idArray.slice(i, i + SQLITE_PARAMS_LIMIT)
     const batchResults = await queryFn(batchIds)
     allResults = [...allResults, ...batchResults]
   }
-  
+
   return allResults
 }
 
 /**
  * Group tags by illust_id from tag query results
  */
-export function groupTagsByIllustId(tagResults: { illust_id: number, tag: any }[]): Map<number, any[]> {
+export function groupTagsByIllustId(
+  tagResults: { illust_id: number; tag: any }[]
+): Map<number, any[]> {
   const tagsByIllustId = new Map<number, any[]>()
-  
+
   tagResults.forEach(result => {
     const illustId = result.illust_id
     const tags = tagsByIllustId.get(illustId) || []
     tags.push(result.tag)
     tagsByIllustId.set(illustId, tags)
   })
-  
+
   return tagsByIllustId
 }
 
 /**
  * Map users to illusts by illust_id
  */
-export function mapUsersByIllustId(userResults: { illust_id: number, users: any }[]): Map<number, any> {
+export function mapUsersByIllustId(
+  userResults: { illust_id: number; users: any }[]
+): Map<number, any> {
   const usersByIllustId = new Map<number, any>()
-  
+
   userResults.forEach(result => {
     usersByIllustId.set(result.illust_id, result.users)
   })
-  
+
   return usersByIllustId
 }
 
@@ -102,8 +106,8 @@ export function mapUsersByIllustId(userResults: { illust_id: number, users: any 
  * Convert tag counts to Tag type for API response
  */
 export function convertToTagResponse(
-  tagCounts: Map<string, { tag: any, count: number }>,
-  limit: number = 10
+  tagCounts: Map<string, { tag: any; count: number }>,
+  limit = 10
 ): Tag[] {
   return Array.from(tagCounts.values())
     .map(({ tag, count }) => ({
@@ -111,7 +115,7 @@ export function convertToTagResponse(
         original: tag.name,
         translated: tag.translated_name,
       },
-      count
+      count,
     }))
     .sort((a, b) => b.count - a.count)
     .slice(0, limit)

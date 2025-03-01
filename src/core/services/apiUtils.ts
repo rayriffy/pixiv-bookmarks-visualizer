@@ -1,4 +1,4 @@
-import { NextApiRequest, NextApiResponse } from 'next'
+import type { NextApiRequest, NextApiResponse } from 'next'
 
 /**
  * Common error response structure
@@ -20,7 +20,7 @@ export const setCacheControl = (res: NextApiResponse, maxAge: number): void => {
  */
 export const withErrorHandling = <T>(
   handler: (req: NextApiRequest, res: NextApiResponse) => Promise<T>,
-  errorPrefix: string = 'API'
+  errorPrefix = 'API'
 ) => {
   return async (req: NextApiRequest, res: NextApiResponse): Promise<void> => {
     try {
@@ -29,7 +29,7 @@ export const withErrorHandling = <T>(
       console.error(`${errorPrefix} error:`, error)
       res.status(500).json({
         error: `An error occurred during ${errorPrefix.toLowerCase()}`,
-        message: error instanceof Error ? error.message : String(error)
+        message: error instanceof Error ? error.message : String(error),
       } as ErrorResponse)
     }
   }
@@ -48,7 +48,7 @@ export const parseQuery = <T>(req: NextApiRequest): T => {
 export const sendCachedResponse = <T>(
   res: NextApiResponse,
   data: T,
-  maxAge: number = 300
+  maxAge = 300
 ): void => {
   setCacheControl(res, maxAge)
   res.send(data)

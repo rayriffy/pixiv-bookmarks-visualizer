@@ -1,20 +1,20 @@
-import fs from 'fs/promises'
-import path from 'path'
+import fs from 'node:fs/promises'
+import path from 'node:path'
 import destr from 'destr'
 import { createClient } from '@libsql/client'
 import { drizzle } from 'drizzle-orm/libsql'
 import dotenv from 'dotenv'
-import crypto from 'crypto'
+import crypto from 'node:crypto'
 
-import { 
-  illustsTable, 
-  tagsTable, 
-  usersTable, 
-  illustTagsTable, 
-  illustUsersTable 
+import {
+  illustsTable,
+  tagsTable,
+  usersTable,
+  illustTagsTable,
+  illustUsersTable,
 } from '../src/db/schema'
 
-import { ExtendedPixivIllust } from '../src/core/@types/ExtendedPixivIllust'
+import type { ExtendedPixivIllust } from '../src/core/@types/ExtendedPixivIllust'
 
 dotenv.config()
 
@@ -54,17 +54,17 @@ async function main() {
         name: illust.user.name,
         account: illust.user.account,
         profile_image_urls: JSON.stringify(illust.user.profile_image_urls),
-        is_followed: illust.user.is_followed
+        is_followed: illust.user.is_followed,
       })
     }
-    
+
     // Track unique tags
     for (const tag of illust.tags) {
       if (!uniqueTags.has(tag.name)) {
         uniqueTags.set(tag.name, {
           id: tagIdCounter++,
           name: tag.name,
-          translated_name: tag.translated_name || null
+          translated_name: tag.translated_name || null,
         })
       }
     }
@@ -76,7 +76,9 @@ async function main() {
   for (let i = 0; i < usersToInsert.length; i += 100) {
     const batch = usersToInsert.slice(i, i + 100)
     await db.insert(usersTable).values(batch).onConflictDoNothing()
-    console.log(`Inserted users batch ${i + 1} to ${Math.min(i + 100, usersToInsert.length)}`)
+    console.log(
+      `Inserted users batch ${i + 1} to ${Math.min(i + 100, usersToInsert.length)}`
+    )
   }
 
   // Insert tags
@@ -85,70 +87,85 @@ async function main() {
   for (let i = 0; i < tagsToInsert.length; i += 100) {
     const batch = tagsToInsert.slice(i, i + 100)
     await db.insert(tagsTable).values(batch).onConflictDoNothing()
-    console.log(`Inserted tags batch ${i + 1} to ${Math.min(i + 100, tagsToInsert.length)}`)
+    console.log(
+      `Inserted tags batch ${i + 1} to ${Math.min(i + 100, tagsToInsert.length)}`
+    )
   }
 
   // Create a map of tag name to ID for quicker lookup
-  const tagMap = new Map(Array.from(uniqueTags.values()).map(tag => [tag.name, tag.id]))
+  const tagMap = new Map(
+    Array.from(uniqueTags.values()).map(tag => [tag.name, tag.id])
+  )
 
   // Insert illustrations and relations
   console.log(`Inserting ${illusts.length} illustrations...`)
   let relationCounter = 1
-  
+
   for (let i = 0; i < illusts.length; i += 25) {
     const batch = illusts.slice(i, i + 25)
-    
+
     // Process each illustration
     for (const illust of batch) {
       // Insert the illustration
-      await db.insert(illustsTable).values({
-        id: illust.id,
-        title: illust.title,
-        type: illust.type,
-        caption: illust.caption,
-        create_date: illust.create_date,
-        page_count: illust.page_count,
-        width: illust.width,
-        height: illust.height,
-        sanity_level: illust.sanity_level,
-        total_view: illust.total_view,
-        total_bookmarks: illust.total_bookmarks,
-        is_bookmarked: illust.is_bookmarked,
-        visible: illust.visible,
-        x_restrict: illust.x_restrict,
-        is_muted: illust.is_muted,
-        total_comments: illust.total_comments ?? 0,
-        illust_ai_type: illust.illust_ai_type,
-        illust_book_style: illust.illust_book_style,
-        restrict: illust.restrict,
-        bookmark_private: illust.bookmark_private,
-        image_urls: JSON.stringify(illust.image_urls),
-        meta_single_page: JSON.stringify(illust.meta_single_page),
-        meta_pages: JSON.stringify(illust.meta_pages),
-        tools: JSON.stringify(illust.tools),
-        url: illust.url || null
-      }).onConflictDoNothing()
+      await db
+        .insert(illustsTable)
+        .values({
+          id: illust.id,
+          title: illust.title,
+          type: illust.type,
+          caption: illust.caption,
+          create_date: illust.create_date,
+          page_count: illust.page_count,
+          width: illust.width,
+          height: illust.height,
+          sanity_level: illust.sanity_level,
+          total_view: illust.total_view,
+          total_bookmarks: illust.total_bookmarks,
+          is_bookmarked: illust.is_bookmarked,
+          visible: illust.visible,
+          x_restrict: illust.x_restrict,
+          is_muted: illust.is_muted,
+          total_comments: illust.total_comments ?? 0,
+          illust_ai_type: illust.illust_ai_type,
+          illust_book_style: illust.illust_book_style,
+          restrict: illust.restrict,
+          bookmark_private: illust.bookmark_private,
+          image_urls: JSON.stringify(illust.image_urls),
+          meta_single_page: JSON.stringify(illust.meta_single_page),
+          meta_pages: JSON.stringify(illust.meta_pages),
+          tools: JSON.stringify(illust.tools),
+          url: illust.url || null,
+        })
+        .onConflictDoNothing()
 
       // Create user-illustration relation
-      await db.insert(illustUsersTable).values({
-        id: relationCounter++,
-        illust_id: illust.id,
-        user_id: illust.user.id
-      }).onConflictDoNothing()
+      await db
+        .insert(illustUsersTable)
+        .values({
+          id: relationCounter++,
+          illust_id: illust.id,
+          user_id: illust.user.id,
+        })
+        .onConflictDoNothing()
 
       // Create tag-illustration relations
       const tagRelations = illust.tags.map(tag => ({
         id: relationCounter++,
         illust_id: illust.id,
-        tag_id: tagMap.get(tag.name)!
+        tag_id: tagMap.get(tag.name)!,
       }))
-      
+
       if (tagRelations.length > 0) {
-        await db.insert(illustTagsTable).values(tagRelations).onConflictDoNothing()
+        await db
+          .insert(illustTagsTable)
+          .values(tagRelations)
+          .onConflictDoNothing()
       }
     }
-    
-    console.log(`Inserted illustrations batch ${i + 1} to ${Math.min(i + 25, illusts.length)}`)
+
+    console.log(
+      `Inserted illustrations batch ${i + 1} to ${Math.min(i + 25, illusts.length)}`
+    )
   }
 
   console.log('Migration completed successfully!')

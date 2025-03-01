@@ -1,13 +1,16 @@
-import fs from 'fs'
-import path from 'path'
+import fs from 'node:fs'
+import path from 'node:path'
 
-import { NextApiHandler } from 'next'
+import type { NextApiHandler } from 'next'
 import destr from 'destr'
 
 import { getPixivImageAndCache } from '../../core/services/getPixivImageAndCache'
-import { handleProxyError, sendBinaryResponse } from '../../core/services/proxyUtils'
+import {
+  handleProxyError,
+  sendBinaryResponse,
+} from '../../core/services/proxyUtils'
 
-import { ExtendedPixivIllust } from '../../core/@types/ExtendedPixivIllust'
+import type { ExtendedPixivIllust } from '../../core/@types/ExtendedPixivIllust'
 
 const ugoiraCacheDirectory = path.join(process.cwd(), '.next/cache/ugoiraProxy')
 
@@ -24,15 +27,13 @@ const api: NextApiHandler = async (req, res) => {
     if (fs.existsSync(path.join(expectedCachePath))) {
       imageData = Buffer.from(await fs.promises.readFile(expectedCachePath))
     } else {
-      const targetUrl = (
-        destr<ExtendedPixivIllust[]>(
-          await fs.promises.readFile(
-            path.join(process.cwd(), '.next/cache/bookmarks.json'),
-            'utf8'
-          )
+      const targetUrl = destr<ExtendedPixivIllust[]>(
+        await fs.promises.readFile(
+          path.join(process.cwd(), '.next/cache/bookmarks.json'),
+          'utf8'
         )
-      ).find(o => o.id === Number(illustId))!.image_urls.medium
-      
+      ).find(o => o.id === Number(illustId))?.image_urls.medium
+
       imageData = await getPixivImageAndCache(targetUrl)
     }
 

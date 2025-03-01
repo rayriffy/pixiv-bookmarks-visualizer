@@ -1,8 +1,8 @@
-import { SQL, eq, gte, lte, ne, sql } from 'drizzle-orm'
+import { type SQL, eq, gte, lte, ne, sql } from 'drizzle-orm'
 
-import { SearchRequest } from '../@types/api/SearchRequest'
+import type { SearchRequest } from '../@types/api/SearchRequest'
 import { illustsTable } from '../../db/schema'
-import { MinimumSizer } from '../@types/MinimumSizer'
+import type { MinimumSizer } from '../@types/MinimumSizer'
 
 /**
  * Process search request parameters into standardized arrays
@@ -12,14 +12,20 @@ export interface ProcessedTags {
   excludeTags: string[]
 }
 
-export const processTagParams = (searchRequest: SearchRequest): ProcessedTags => {
-  const includeTags = Array.isArray(searchRequest.includeTags) 
-    ? searchRequest.includeTags 
-    : (typeof searchRequest.includeTags === 'string' ? [searchRequest.includeTags] : [])
-  
-  const excludeTags = Array.isArray(searchRequest.excludeTags) 
-    ? searchRequest.excludeTags 
-    : (typeof searchRequest.excludeTags === 'string' ? [searchRequest.excludeTags] : [])
+export const processTagParams = (
+  searchRequest: SearchRequest
+): ProcessedTags => {
+  const includeTags = Array.isArray(searchRequest.includeTags)
+    ? searchRequest.includeTags
+    : typeof searchRequest.includeTags === 'string'
+      ? [searchRequest.includeTags]
+      : []
+
+  const excludeTags = Array.isArray(searchRequest.excludeTags)
+    ? searchRequest.excludeTags
+    : typeof searchRequest.excludeTags === 'string'
+      ? [searchRequest.excludeTags]
+      : []
 
   return { includeTags, excludeTags }
 }
@@ -27,7 +33,9 @@ export const processTagParams = (searchRequest: SearchRequest): ProcessedTags =>
 /**
  * Create SQL filters from a search request
  */
-export const createFiltersFromSearchRequest = (searchRequest: SearchRequest): SQL[] => {
+export const createFiltersFromSearchRequest = (
+  searchRequest: SearchRequest
+): SQL[] => {
   const filters: SQL[] = []
 
   // Parse numeric parameters

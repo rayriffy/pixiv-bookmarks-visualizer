@@ -1,21 +1,29 @@
-import { SQL, and, count, desc, eq, inArray } from 'drizzle-orm'
-import { SearchRequest } from '../@types/api/SearchRequest'
+import { type SQL, and, count, desc, eq, inArray } from 'drizzle-orm'
+import type { SearchRequest } from '../@types/api/SearchRequest'
 import { getDbClient } from '../../db/connect'
-import { illustTagsTable, illustUsersTable, illustsTable, tagsTable, usersTable } from '../../db/schema'
+import {
+  illustTagsTable,
+  illustUsersTable,
+  illustsTable,
+  tagsTable,
+  usersTable,
+} from '../../db/schema'
 import {
   dbResultToPixivIllust,
   groupTagsByIllustId,
   mapUsersByIllustId,
   batchedQuery,
 } from './dbUtils'
-import { SearchResult } from '../@types/api/SearchResult'
+import type { SearchResult } from '../@types/api/SearchResult'
 import { createFiltersFromSearchRequest, processTagParams } from './filterUtils'
 import { processTagFilters } from './tagFilterUtils'
 
 /**
  * Search illusts with optimized queries leveraging indexes
  */
-export async function searchIllusts(searchRequest: SearchRequest): Promise<SearchResult> {
+export async function searchIllusts(
+  searchRequest: SearchRequest
+): Promise<SearchResult> {
   const db = getDbClient()
   const pageSize = 30
   const page = Number(searchRequest.page) || 1
@@ -34,7 +42,7 @@ export async function searchIllusts(searchRequest: SearchRequest): Promise<Searc
       // If there are no matching illusts after tag filtering, return empty
       return { illusts: [], count: 0, paginate: { current: page, max: 0 } }
     }
-    
+
     // Add illust ID filter
     filters.push(inArray(illustsTable.id, targetIllustIds))
   }
@@ -54,7 +62,7 @@ export async function searchIllusts(searchRequest: SearchRequest): Promise<Searc
   // Get the illust data with pagination
   const results = await db
     .select({
-      illusts: illustsTable
+      illusts: illustsTable,
     })
     .from(illustsTable)
     .where(and(...filters))
@@ -68,22 +76,24 @@ export async function searchIllusts(searchRequest: SearchRequest): Promise<Searc
   // Get user data in parallel to tags data
   const [userResults, tagResults] = await Promise.all([
     // User data using illustUsersTable indexes
-    db.select({
+    db
+      .select({
         illust_id: illustUsersTable.illust_id,
-        users: usersTable
+        users: usersTable,
       })
       .from(illustUsersTable)
       .innerJoin(usersTable, eq(illustUsersTable.user_id, usersTable.id))
       .where(inArray(illustUsersTable.illust_id, illustIds)),
-    
+
     // Tag data using illustTagsTable indexes
-    db.select({
+    db
+      .select({
         illust_id: illustTagsTable.illust_id,
-        tag: tagsTable
+        tag: tagsTable,
       })
       .from(illustTagsTable)
       .innerJoin(tagsTable, eq(illustTagsTable.tag_id, tagsTable.id))
-      .where(inArray(illustTagsTable.illust_id, illustIds))
+      .where(inArray(illustTagsTable.illust_id, illustIds)),
   ])
 
   // Map users to illusts - uses the same efficient function
@@ -97,7 +107,7 @@ export async function searchIllusts(searchRequest: SearchRequest): Promise<Searc
     const combinedResult = {
       illusts: result.illusts,
       users: usersByIllustId.get(result.illusts.id),
-      tags: tagsByIllustId.get(result.illusts.id) || []
+      tags: tagsByIllustId.get(result.illusts.id) || [],
     }
     return dbResultToPixivIllust(combinedResult)
   })
@@ -108,7 +118,7 @@ export async function searchIllusts(searchRequest: SearchRequest): Promise<Searc
     count: total,
     paginate: {
       current: page,
-      max: Math.ceil(total / pageSize)
-    }
+      max: Math.ceil(total / pageSize),
+    },
   }
 }

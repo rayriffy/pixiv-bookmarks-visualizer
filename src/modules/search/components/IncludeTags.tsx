@@ -1,9 +1,12 @@
 import Async from 'react-select/async'
 import { WindowedMenuList } from 'react-windowed-select'
 import { useContext, useState } from 'react'
-import { SearchBarContext, TagItem } from '../../../context/SearchBarContext'
-import { TagSearchRequest } from '../../../core/@types/api/TagSearchRequest'
-import { TagSearchResponse } from '../../../core/@types/api/TagSearchResponse'
+import {
+  SearchBarContext,
+  type TagItem,
+} from '../../../context/SearchBarContext'
+import type { TagSearchRequest } from '../../../core/@types/api/TagSearchRequest'
+import type { TagSearchResponse } from '../../../core/@types/api/TagSearchResponse'
 import { buildURLParams } from '../../../core/services/buildURLParams'
 import { TagSearchItem } from './TagSearchItem'
 
@@ -30,7 +33,7 @@ export const IncludeTags = () => {
         value: {
           name: tag.name.original,
           translated: tag.name.translated,
-          count: tag.count
+          count: tag.count,
         } as TagItem,
         label: <TagSearchItem {...tag} />,
       }))
@@ -45,13 +48,15 @@ export const IncludeTags = () => {
   // Create the value object for react-select
   const selectValue = tags.map(tag => ({
     value: tag,
-    label: <TagSearchItem 
-      name={{ 
-        original: tag.name, 
-        translated: tag.translated || null 
-      }} 
-      count={tag.count || 0} 
-    />
+    label: (
+      <TagSearchItem
+        name={{
+          original: tag.name,
+          translated: tag.translated || null,
+        }}
+        count={tag.count || 0}
+      />
+    ),
   }))
 
   return (

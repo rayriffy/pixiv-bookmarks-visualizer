@@ -1,14 +1,14 @@
 import { useState } from 'react'
 
-import { NextPage } from 'next'
-import { AppProps } from 'next/app'
+import type { NextPage } from 'next'
+import type { AppProps } from 'next/app'
 import Head from 'next/head'
 
 import { SWRConfig } from 'swr'
 
-import { SearchBarContext, TagItem } from '../context/SearchBarContext'
+import { SearchBarContext, type TagItem } from '../context/SearchBarContext'
 import { minimumSizer } from '../context/defaults/minimumSizer'
-import { MinimumSizer } from '../core/@types/MinimumSizer'
+import type { MinimumSizer } from '../core/@types/MinimumSizer'
 import '../styles/tailwind.css'
 
 const App: NextPage<AppProps> = props => {
@@ -25,9 +25,10 @@ const App: NextPage<AppProps> = props => {
   const maximumPageCount = useState<string>('0')
 
   return (
-    <SWRConfig 
+    <SWRConfig
       value={{
-        fetcher: (resource, init) => fetch(resource, init).then(res => res.json())
+        fetcher: (resource, init) =>
+          fetch(resource, init).then(res => res.json()),
       }}
     >
       <Head>

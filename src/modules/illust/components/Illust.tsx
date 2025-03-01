@@ -3,7 +3,7 @@ import { memo, useContext, useEffect, useMemo } from 'react'
 import { useHover } from 'web-api-hooks'
 
 import { RectangleStackIcon } from '@heroicons/react/24/solid'
-import { ExtendedPixivIllust } from '../../../core/@types/ExtendedPixivIllust'
+import type { ExtendedPixivIllust } from '../../../core/@types/ExtendedPixivIllust'
 import { getOptimizedIllustUrl } from '../services/getOptimizedIllustUrl'
 import { SearchBarContext } from '../../../context/SearchBarContext'
 import { classNames } from '../../../core/components/classNames'
@@ -54,7 +54,7 @@ export const Illust = memo<Props>(props => {
       <a
         href={`https://www.pixiv.net/artworks/${illust.id}`}
         target="_blank"
-        rel="noopener noreferer"
+        rel="noreferrer noopener noreferer"
       >
         <span className="absolute bg-black/70 px-2 py-0.5 text-xs font-mono text-white z-[4] rounded-full top-1 left-1">
           {illust.width} x {illust.height}

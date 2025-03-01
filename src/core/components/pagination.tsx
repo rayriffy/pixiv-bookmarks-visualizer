@@ -17,8 +17,8 @@ export const Pagination = memo<Props>(props => {
       ? current - 2 < 1
         ? 0
         : current + 2 > max
-        ? max - pageLength
-        : current - (pageLength - 2)
+          ? max - pageLength
+          : current - (pageLength - 2)
       : 0
 
   return (
@@ -28,13 +28,15 @@ export const Pagination = memo<Props>(props => {
           <Link
             key={`pagination-${startPoint + i}`}
             href={startPoint + i === 0 ? '/' : `/${startPoint + i + 1}`}
-            className={classNames("join-item btn", current === startPoint + i + 1 ? "btn-active" : "")}
+            className={classNames(
+              'join-item btn',
+              current === startPoint + i + 1 ? 'btn-active' : ''
+            )}
           >
             {startPoint + i + 1}
           </Link>
         ))}
       </div>
-
     </div>
-  );
+  )
 })

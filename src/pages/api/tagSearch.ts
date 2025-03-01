@@ -1,8 +1,12 @@
-import { NextApiHandler } from 'next'
+import type { NextApiHandler } from 'next'
 
-import { TagSearchRequest } from '../../core/@types/api/TagSearchRequest'
+import type { TagSearchRequest } from '../../core/@types/api/TagSearchRequest'
 import { searchTags } from '../../core/services/searchTags'
-import { parseQuery, sendCachedResponse, withErrorHandling } from '../../core/services/apiUtils'
+import {
+  parseQuery,
+  sendCachedResponse,
+  withErrorHandling,
+} from '../../core/services/apiUtils'
 
 const handleTagSearch = async (req, res) => {
   const tagSearchRequest = parseQuery<TagSearchRequest>(req)

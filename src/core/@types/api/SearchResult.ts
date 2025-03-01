@@ -1,4 +1,4 @@
-import { ExtendedPixivIllust } from '../ExtendedPixivIllust'
+import type { ExtendedPixivIllust } from '../ExtendedPixivIllust'
 
 export interface SearchResult {
   illusts: ExtendedPixivIllust[]

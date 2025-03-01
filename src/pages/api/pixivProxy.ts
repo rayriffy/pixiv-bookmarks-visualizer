@@ -1,7 +1,10 @@
-import { NextApiHandler } from 'next'
+import type { NextApiHandler } from 'next'
 
 import { getPixivImageAndCache } from '../../core/services/getPixivImageAndCache'
-import { handleProxyError, sendBinaryResponse } from '../../core/services/proxyUtils'
+import {
+  handleProxyError,
+  sendBinaryResponse,
+} from '../../core/services/proxyUtils'
 
 const api: NextApiHandler = async (req, res) => {
   try {

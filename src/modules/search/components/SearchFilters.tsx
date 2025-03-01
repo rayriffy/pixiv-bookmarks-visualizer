@@ -9,11 +9,10 @@ import { SafeForWork } from './SafeForWork'
 
 export const SearchFilters = () => {
   return (
-    <fieldset
-      className="fieldset bg-base-100 border border-base-300 p-4 rounded-box md:col-span-1 lg:col-span-3">
+    <fieldset className="fieldset bg-base-100 border border-base-300 p-4 rounded-box md:col-span-1 lg:col-span-3">
       <legend className="fieldset-legend">Search filters</legend>
 
-      <div className={"grid lg:grid-cols-5 -mt-3 gap-4"}>
+      <div className={'grid lg:grid-cols-5 -mt-3 gap-4'}>
         <fieldset className="fieldset">
           <BookmarkType />
           <Aspect />

@@ -1,4 +1,4 @@
-import { ExtendedPixivIllust } from '../../../core/@types/ExtendedPixivIllust'
+import type { ExtendedPixivIllust } from '../../../core/@types/ExtendedPixivIllust'
 
 export const supporterFilter = (illust: ExtendedPixivIllust): boolean => {
   return [illust.title, illust.caption].some(line =>

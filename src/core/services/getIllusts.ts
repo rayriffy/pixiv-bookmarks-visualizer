@@ -1,10 +1,10 @@
-import fs from 'fs/promises'
-import path from 'path'
+import fs from 'node:fs/promises'
+import path from 'node:path'
 
 import destr from 'destr'
 import mem from 'mem'
 
-import { ExtendedPixivIllust } from '../@types/ExtendedPixivIllust'
+import type { ExtendedPixivIllust } from '../@types/ExtendedPixivIllust'
 
 export const getIllusts = mem(
   async (): Promise<ExtendedPixivIllust[]> => {
