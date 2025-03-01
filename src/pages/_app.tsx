@@ -9,10 +9,6 @@ import { SWRConfig } from 'swr'
 import { SearchBarContext } from '../context/SearchBarContext'
 import { minimumSizer } from '../context/defaults/minimumSizer'
 import { MinimumSizer } from '../core/@types/MinimumSizer'
-import {
-  SearchFilters
-} from '../modules/searchFilters/components/SearchFilters'
-
 import '../styles/tailwind.css'
 
 const App: NextPage<AppProps> = props => {
