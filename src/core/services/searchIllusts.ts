@@ -6,11 +6,11 @@ import { MinimumSizer } from '../@types/MinimumSizer'
 import {
   dbResultToPixivIllust,
   groupTagsByIllustId,
-  convertToTagResponse,
   mapUsersByIllustId,
 } from './dbUtils'
+import { SearchResult } from '../@types/api/SearchResult'
 
-export async function searchIllusts(searchRequest: SearchRequest) {
+export async function searchIllusts(searchRequest: SearchRequest): Promise<SearchResult> {
   const db = getDbClient()
   const pageSize = 30
   const page = Number(searchRequest.page) || 1
@@ -153,7 +153,7 @@ export async function searchIllusts(searchRequest: SearchRequest) {
   if (targetIllustIds !== null) {
     if (targetIllustIds.length === 0) {
       // If there are no matching illusts after tag filtering, return empty
-      return { illusts: [], count: 0, tags: [], paginate: { current: page, max: 0 } }
+      return { illusts: [], count: 0, paginate: { current: page, max: 0 } }
     }
     
     // Add illust ID filter
@@ -168,7 +168,7 @@ export async function searchIllusts(searchRequest: SearchRequest) {
 
   // Early return if no results
   if (total === 0) {
-    return { illusts: [], count: 0, tags: [], paginate: { current: page, max: 0 } }
+    return { illusts: [], count: 0, paginate: { current: page, max: 0 } }
   }
 
   // Get the illust data with pagination
@@ -220,31 +220,10 @@ export async function searchIllusts(searchRequest: SearchRequest) {
     return dbResultToPixivIllust(combinedResult)
   })
 
-  // Get related tags for search suggestions
-  // 1. Get all tags from the current filtered illusts (excluding already selected tags)
-  const allTagsInResults = tagResults
-    .filter(t => !includeTags.includes(t.tag.name) && !excludeTags.includes(t.tag.name))
-    .map(t => t.tag)
-
-  // 2. Count occurrences of each tag
-  const tagCounts = new Map<string, { tag: any, count: number }>()
-  allTagsInResults.forEach(tag => {
-    if (!tagCounts.has(tag.name)) {
-      tagCounts.set(tag.name, { tag, count: 1 })
-    } else {
-      const current = tagCounts.get(tag.name)!
-      tagCounts.set(tag.name, { ...current, count: current.count + 1 })
-    }
-  })
-
-  // 3. Convert to expected Tag format and sort by count
-  const relatedTags = convertToTagResponse(tagCounts, 10)
-
   // Construct the final result with pagination
   return {
     illusts,
     count: total,
-    tags: relatedTags,
     paginate: {
       current: page,
       max: Math.ceil(total / pageSize)

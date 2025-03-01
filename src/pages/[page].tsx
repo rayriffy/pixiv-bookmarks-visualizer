@@ -15,6 +15,7 @@ import {
   SearchFilters
 } from '../modules/search/components/SearchFilters'
 import { TopTags } from '../modules/topTags/component/TopTags'
+import { Tag } from '../core/@types/api/TagSearchResponse'
 
 const Page: NextPage = props => {
   const { query } = useRouter()
@@ -54,12 +55,15 @@ const Page: NextPage = props => {
   const { data, error } = useSWR<SearchResult, any, string>(
     `/api/search?${buildURLParams(searchPayload)}`
   )
+  const { data: topTagsResponse, error: topTagsError } = useSWR<{ tags: Tag[] }, any, string>(
+    `/api/topTags?${buildURLParams(searchPayload)}`
+  )
 
   return (
     <main className={"p-4"}>
       <section className={"grid md:grid-cols-2 lg:grid-cols-4 gap-4"}>
         <SearchFilters />
-        <TopTags tags={data?.tags ?? []} />
+        <TopTags tags={topTagsResponse?.tags ?? []} />
       </section>
       <div className="py-6">
         {!data && !error ? (

@@ -38,11 +38,18 @@ export const ExcludeTags = () => {
     }
   }
 
+  // Create the value object for react-select
+  const selectValue = tags.map(tag => ({
+    value: tag,
+    label: <TagSearchItem name={{ original: tag, translated: null }} count={0} />
+  }))
+
   return (
     <fieldset className="fieldset">
       <label className="fieldset-label">Exclude tags</label>
       <Async
         isMulti
+        value={selectValue}
         loadOptions={excludedTagLoadOptions}
         isLoading={loading}
         onChange={val => setTags(val.map(o => o.value))}
