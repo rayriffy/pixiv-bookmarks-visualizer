@@ -6,11 +6,15 @@ import {
   dbResultToPixivIllust,
   groupTagsByIllustId,
   mapUsersByIllustId,
+  batchedQuery,
 } from './dbUtils'
 import { SearchResult } from '../@types/api/SearchResult'
 import { createFiltersFromSearchRequest, processTagParams } from './filterUtils'
 import { processTagFilters } from './tagFilterUtils'
 
+/**
+ * Search illusts with optimized queries leveraging indexes
+ */
 export async function searchIllusts(searchRequest: SearchRequest): Promise<SearchResult> {
   const db = getDbClient()
   const pageSize = 30
@@ -20,7 +24,7 @@ export async function searchIllusts(searchRequest: SearchRequest): Promise<Searc
   // Create base filters from search request
   const filters: SQL[] = createFiltersFromSearchRequest(searchRequest)
 
-  // Process tag filters
+  // Process tag filters using optimized tag filter utility
   const tags = processTagParams(searchRequest)
   const targetIllustIds = await processTagFilters(tags, filters)
 
@@ -36,6 +40,7 @@ export async function searchIllusts(searchRequest: SearchRequest): Promise<Searc
   }
 
   // Get the total count first to support pagination
+  // This uses the indexes on filtered fields
   const [{ total }] = await db
     .select({ total: count() })
     .from(illustsTable)
@@ -53,36 +58,38 @@ export async function searchIllusts(searchRequest: SearchRequest): Promise<Searc
     })
     .from(illustsTable)
     .where(and(...filters))
-    .orderBy(desc(illustsTable.id))
+    .orderBy(desc(illustsTable.id)) // Uses id index for ordering
     .limit(pageSize)
     .offset(offset)
 
   // Get user data for these illusts
   const illustIds = results.map(r => r.illusts.id)
 
-  const userResults = await db
-    .select({
-      illust_id: illustUsersTable.illust_id,
-      users: usersTable
-    })
-    .from(illustUsersTable)
-    .innerJoin(usersTable, eq(illustUsersTable.user_id, usersTable.id))
-    .where(inArray(illustUsersTable.illust_id, illustIds))
+  // Get user data in parallel to tags data
+  const [userResults, tagResults] = await Promise.all([
+    // User data using illustUsersTable indexes
+    db.select({
+        illust_id: illustUsersTable.illust_id,
+        users: usersTable
+      })
+      .from(illustUsersTable)
+      .innerJoin(usersTable, eq(illustUsersTable.user_id, usersTable.id))
+      .where(inArray(illustUsersTable.illust_id, illustIds)),
+    
+    // Tag data using illustTagsTable indexes
+    db.select({
+        illust_id: illustTagsTable.illust_id,
+        tag: tagsTable
+      })
+      .from(illustTagsTable)
+      .innerJoin(tagsTable, eq(illustTagsTable.tag_id, tagsTable.id))
+      .where(inArray(illustTagsTable.illust_id, illustIds))
+  ])
 
-  // Map users to illusts
+  // Map users to illusts - uses the same efficient function
   const usersByIllustId = mapUsersByIllustId(userResults)
 
-  // Get tags for these illusts
-  const tagResults = await db
-    .select({
-      illust_id: illustTagsTable.illust_id,
-      tag: tagsTable
-    })
-    .from(illustTagsTable)
-    .innerJoin(tagsTable, eq(illustTagsTable.tag_id, tagsTable.id))
-    .where(inArray(illustTagsTable.illust_id, illustIds))
-
-  // Group tags by illust
+  // Group tags by illust - uses the same efficient function
   const tagsByIllustId = groupTagsByIllustId(tagResults)
 
   // Combine all the data into ExtendedPixivIllust format

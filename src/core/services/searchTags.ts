@@ -3,12 +3,13 @@ import { TagSearchRequest } from '../@types/api/TagSearchRequest'
 import { Tag, TagSearchResponse } from '../@types/api/TagSearchResponse'
 import { getDbClient } from '../../db/connect'
 import { illustTagsTable, tagsTable } from '../../db/schema'
+import { batchedQuery } from './dbUtils'
 
 // SQLite parameter limit
 const SQLITE_PARAMS_LIMIT = 500
 
 /**
- * Optimized tag search function using Drizzle ORM
+ * Optimized tag search function using Drizzle ORM with index-aware queries
  */
 export async function searchTags(
   request: TagSearchRequest
@@ -25,30 +26,57 @@ export async function searchTags(
   let filteredIllustIds: number[] = []
   
   if (selectedTags.length > 0) {
-    // For each selected tag, get illusts that have it
-    const tagQueries = await Promise.all(selectedTags.map(async (tagName) => {
-      // Get tag ID first
-      const tagResult = await db
-        .select({ id: tagsTable.id })
+    // Get all tag IDs in one query first (using the name index)
+    const tagNames = selectedTags.filter(Boolean) // Filter out any empty strings
+    if (tagNames.length === 0) {
+      return { tags: [] }
+    }
+    
+    // Get tag IDs efficiently with batching
+    const tagIdsMap = new Map<string, number>()
+    
+    // Process in small batches to avoid parameter limits
+    for (let i = 0; i < tagNames.length; i += 20) {
+      const batchNames = tagNames.slice(i, i + 20)
+      const tagResults = await db
+        .select({ id: tagsTable.id, name: tagsTable.name })
         .from(tagsTable)
-        .where(eq(tagsTable.name, tagName))
-        .limit(1)
+        .where(inArray(tagsTable.name, batchNames))
         
-      if (tagResult.length === 0) return []
-      
-      // Get illust IDs that have this tag
-      const illustResults = await db
-        .select({ illust_id: illustTagsTable.illust_id })
-        .from(illustTagsTable)
-        .where(eq(illustTagsTable.tag_id, tagResult[0].id))
+      tagResults.forEach(tag => {
+        tagIdsMap.set(tag.name, tag.id)
+      })
+    }
+    
+    // If any tag doesn't exist, there's no match
+    if (tagNames.some(name => !tagIdsMap.has(name))) {
+      return { tags: [] }
+    }
+    
+    const validTagIds = Array.from(tagIdsMap.values())
+    
+    // For each tag ID, get matching illusts using the tag_id index
+    const tagIllustSets = await Promise.all(
+      validTagIds.map(async (tagId) => {
+        const illustResults = await db
+          .select({ illust_id: illustTagsTable.illust_id })
+          .from(illustTagsTable)
+          .where(eq(illustTagsTable.tag_id, tagId))
         
-      return illustResults.map(r => r.illust_id)
-    }))
+        // Use a Set for faster lookups in intersection
+        return new Set(illustResults.map(r => r.illust_id))
+      })
+    )
     
     // Find illusts that have ALL selected tags (intersection)
-    if (tagQueries.length > 0 && tagQueries[0].length > 0) {
-      filteredIllustIds = tagQueries.reduce((acc, curr) => 
-        acc.filter(id => curr.includes(id))
+    if (tagIllustSets.length > 0 && tagIllustSets[0].size > 0) {
+      // Start with the smallest set for best performance
+      const sortedSets = [...tagIllustSets].sort((a, b) => a.size - b.size)
+      const baseSet = sortedSets[0]
+      
+      // Keep only IDs that are in all sets
+      filteredIllustIds = Array.from(baseSet).filter(id => 
+        sortedSets.every(set => set.has(id))
       )
     }
     
@@ -59,64 +87,21 @@ export async function searchTags(
   }
   
   // Function to process a batch of illusts and count their tags
-  async function processIllustBatch(illustIds: number[]): Promise<Record<number, number>> {
-    // Get all tag relationships for these illusts
-    const tagRelations = await db
+  async function processIllustBatch(illustIds: number[]): Promise<{tag_id: number, count: number}[]> {
+    // Use composite index (illust_id, tag_id) for better performance
+    return db
       .select({
         tag_id: illustTagsTable.tag_id,
+        count: count(illustTagsTable.tag_id),
       })
       .from(illustTagsTable)
       .where(inArray(illustTagsTable.illust_id, illustIds))
-
-    // Count occurrences of each tag
-    const tagCounts: Record<number, number> = {}
-    tagRelations.forEach(relation => {
-      tagCounts[relation.tag_id] = (tagCounts[relation.tag_id] || 0) + 1
-    })
-    
-    return tagCounts
+      .groupBy(illustTagsTable.tag_id)
   }
   
-  // Helper to get tag details by IDs
+  // Helper to get tag details by IDs with optimized batching
   async function getTagDetails(tagIds: number[]): Promise<any[]> {
-    // Process in batches if needed
-    if (tagIds.length > SQLITE_PARAMS_LIMIT) {
-      let allTags: any[] = []
-      for (let i = 0; i < tagIds.length; i += SQLITE_PARAMS_LIMIT) {
-        const batchIds = tagIds.slice(i, i + SQLITE_PARAMS_LIMIT)
-        
-        let tagQuery = db
-          .select({
-            id: tagsTable.id,
-            name: tagsTable.name,
-            translated_name: tagsTable.translated_name,
-          })
-          .from(tagsTable)
-          .where(inArray(tagsTable.id, batchIds))
-        
-        // Apply text search if needed
-        if (query) {
-          const lowerQuery = `%${query.toLowerCase()}%`
-          const whereClause = or(
-            sql`lower(${tagsTable.name}) like ${lowerQuery}`,
-            sql`lower(${tagsTable.translated_name}) like ${lowerQuery}`
-          )
-          tagQuery = db
-            .select({
-              id: tagsTable.id,
-              name: tagsTable.name,
-              translated_name: tagsTable.translated_name,
-            })
-            .from(tagsTable)
-            .where(and(inArray(tagsTable.id, batchIds), whereClause))
-        }
-        
-        const batchResults = await tagQuery.execute()
-        allTags = [...allTags, ...batchResults]
-      }
-      return allTags
-    } else {
-      // For smaller batches
+    return batchedQuery(tagIds, async (batchIds) => {
       let tagQuery = db
         .select({
           id: tagsTable.id,
@@ -124,54 +109,49 @@ export async function searchTags(
           translated_name: tagsTable.translated_name,
         })
         .from(tagsTable)
-        .where(inArray(tagsTable.id, tagIds))
+        .where(inArray(tagsTable.id, batchIds))
       
-      // Apply text search if needed
+      // Apply text search if needed, utilizing indexes
       if (query) {
         const lowerQuery = `%${query.toLowerCase()}%`
         const whereClause = or(
           sql`lower(${tagsTable.name}) like ${lowerQuery}`,
           sql`lower(${tagsTable.translated_name}) like ${lowerQuery}`
         )
-        tagQuery = db
-          .select({
-            id: tagsTable.id,
-            name: tagsTable.name,
-            translated_name: tagsTable.translated_name,
-          })
-          .from(tagsTable)
-          .where(and(inArray(tagsTable.id, tagIds), whereClause))
+        
+        tagQuery = tagQuery.where(whereClause)
       }
       
       return tagQuery.execute()
-    }
+    })
   }
   
   // Process differently based on whether we have filtered illusts
   let tagCountsMap: Record<number, number> = {}
   
   if (selectedTags.length > 0) {
-    // Process filtered illusts in batches
-    for (let i = 0; i < filteredIllustIds.length; i += SQLITE_PARAMS_LIMIT) {
-      const batchIds = filteredIllustIds.slice(i, i + SQLITE_PARAMS_LIMIT)
-      const batchCounts = await processIllustBatch(batchIds)
-      
-      // Combine with overall counts
-      Object.entries(batchCounts).forEach(([tagId, count]) => {
-        const numericTagId = Number(tagId)
-        tagCountsMap[numericTagId] = (tagCountsMap[numericTagId] || 0) + count
-      })
-    }
-  } else {
-    // Get all tag counts by processing all illusts in the database
-    // Get all illust IDs first - this could be optimized further with a direct count query
-    const allIllustrationsQuery = await db
-      .select({ id: illustTagsTable.illust_id, tag_id: illustTagsTable.tag_id })
-      .from(illustTagsTable)
+    // Process filtered illusts in batches, using batch query utility
+    // Note: batchedQuery returns a flattened array, not an array of batch results
+    const results = await batchedQuery(filteredIllustIds, processIllustBatch)
     
-    // Count occurrences of each tag
-    allIllustrationsQuery.forEach(relation => {
-      tagCountsMap[relation.tag_id] = (tagCountsMap[relation.tag_id] || 0) + 1
+    // Each result contains a tag_id and count
+    results.forEach(result => {
+      const numericTagId = result.tag_id
+      tagCountsMap[numericTagId] = (tagCountsMap[numericTagId] || 0) + Number(result.count)
+    })
+  } else {
+    // Use optimized direct count query instead of fetching all
+    const tagCounts = await db
+      .select({
+        tag_id: illustTagsTable.tag_id,
+        count: count(illustTagsTable.illust_id),
+      })
+      .from(illustTagsTable)
+      .groupBy(illustTagsTable.tag_id)
+    
+    // Convert to map for faster lookups
+    tagCounts.forEach(result => {
+      tagCountsMap[result.tag_id] = Number(result.count)
     })
   }
   
@@ -202,6 +182,7 @@ export async function searchTags(
   // Convert to array and sort by count
   const tags = Array.from(uniqueTags.values())
     .sort((a, b) => b.count - a.count)
+    .slice(0, request.limit ? Number(request.limit) : 20) // Apply limit early
   
   return { tags }
 }
