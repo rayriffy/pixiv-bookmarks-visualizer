@@ -1,19 +1,19 @@
 import { NextPage } from 'next'
 import { useRouter } from 'next/router'
 
-import { useMemo, useContext, useState } from 'react'
+import { useMemo, useContext } from 'react'
 import useSWR from 'swr'
 
 import { buildURLParams } from '../core/services/buildURLParams'
 import { SearchBarContext } from '../context/SearchBarContext'
 import { Pagination } from '../core/components/pagination'
-import { Illust } from '../modules/illust/components/illust'
+import { Illust } from '../modules/illust/components/Illust'
 
 import { SearchRequest } from '../core/@types/api/SearchRequest'
 import { SearchResult } from '../core/@types/api/SearchResult'
 import {
   SearchFilters
-} from '../modules/searchFilters/components/SearchFilters'
+} from '../modules/search/components/SearchFilters'
 import { TopTags } from '../modules/topTags/component/TopTags'
 
 const Page: NextPage = props => {
