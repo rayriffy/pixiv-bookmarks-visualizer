@@ -31,6 +31,7 @@ After that, install dependencies reqired for this project and run a script to ob
 
 ```
 pnpm i
+pnpm db:init
 pnpm build:data
 ```
 
