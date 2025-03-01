@@ -97,15 +97,21 @@ export async function searchTags(
         // Apply text search if needed
         if (query) {
           const lowerQuery = `%${query.toLowerCase()}%`
-          tagQuery = tagQuery.where(
-            or(
-              sql`lower(${tagsTable.name}) like ${lowerQuery}`,
-              sql`lower(${tagsTable.translated_name}) like ${lowerQuery}`
-            )
+          const whereClause = or(
+            sql`lower(${tagsTable.name}) like ${lowerQuery}`,
+            sql`lower(${tagsTable.translated_name}) like ${lowerQuery}`
           )
+          tagQuery = db
+            .select({
+              id: tagsTable.id,
+              name: tagsTable.name,
+              translated_name: tagsTable.translated_name,
+            })
+            .from(tagsTable)
+            .where(and(inArray(tagsTable.id, batchIds), whereClause))
         }
         
-        const batchResults = await tagQuery
+        const batchResults = await tagQuery.execute()
         allTags = [...allTags, ...batchResults]
       }
       return allTags
@@ -123,15 +129,21 @@ export async function searchTags(
       // Apply text search if needed
       if (query) {
         const lowerQuery = `%${query.toLowerCase()}%`
-        tagQuery = tagQuery.where(
-          or(
-            sql`lower(${tagsTable.name}) like ${lowerQuery}`,
-            sql`lower(${tagsTable.translated_name}) like ${lowerQuery}`
-          )
+        const whereClause = or(
+          sql`lower(${tagsTable.name}) like ${lowerQuery}`,
+          sql`lower(${tagsTable.translated_name}) like ${lowerQuery}`
         )
+        tagQuery = db
+          .select({
+            id: tagsTable.id,
+            name: tagsTable.name,
+            translated_name: tagsTable.translated_name,
+          })
+          .from(tagsTable)
+          .where(and(inArray(tagsTable.id, tagIds), whereClause))
       }
       
-      return tagQuery
+      return tagQuery.execute()
     }
   }
   

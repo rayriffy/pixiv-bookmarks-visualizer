@@ -44,6 +44,7 @@ function dbResultToPixivIllust(result: any): ExtendedPixivIllust {
       account: result.users.account,
       profile_image_urls: JSON.parse(result.users.profile_image_urls),
       is_followed: result.users.is_followed,
+      comment: '',
     },
     tags: result.tags.map((tag: any) => ({
       name: tag.name,
@@ -140,11 +141,19 @@ export const searchIllustsByTags = async (
     .innerJoin(tagsTable, eq(illustTagsTable.tag_id, tagsTable.id))
   
   // Handle include tags
+  let whereClause: SQL | undefined = undefined;
   if (includeTags.length > 0) {
-    illustIdsQuery = illustIdsQuery.where(inArray(tagsTable.name, includeTags))
+    whereClause = inArray(tagsTable.name, includeTags);
   }
   
-  const matchingIllustIds = await illustIdsQuery
+  const matchingIllustIds = await db
+    .select({
+      illust_id: illustTagsTable.illust_id,
+    })
+    .from(illustTagsTable)
+    .innerJoin(tagsTable, eq(illustTagsTable.tag_id, tagsTable.id))
+    .where(whereClause)
+    .execute()
   const includedIllustIds = matchingIllustIds.map(result => result.illust_id)
   
   // Get illustrations that don't have excluded tags
@@ -234,13 +243,8 @@ export const getTagCounts = async (
 ): Promise<{ name: string, translated_name: string | null, count: number }[]> => {
   const db = getDbClient()
   
-  // Start with base query
-  let tagsQuery = db
-    .select({
-      tag_id: illustTagsTable.tag_id,
-      illust_id: illustTagsTable.illust_id,
-    })
-    .from(illustTagsTable)
+  // Start with base query - we'll define it inside the conditions below
+  let tagCounts: { tag_id: number; illust_id: number }[] = [];
   
   // Filter by selected tags if provided
   if (selectedTags.length > 0) {
@@ -252,16 +256,24 @@ export const getTagCounts = async (
       .from(illustTagsTable)
       .innerJoin(tagsTable, eq(illustTagsTable.tag_id, tagsTable.id))
       .where(inArray(tagsTable.name, selectedTags))
+      .execute()
     
     const illustIds = filteredIllusts.map(result => result.illust_id)
     
     // Only include tags from those illusts - in batches if needed
     if (illustIds.length > 0) {
       if (illustIds.length <= SQLITE_PARAMS_LIMIT) {
-        tagsQuery = tagsQuery.where(inArray(illustTagsTable.illust_id, illustIds))
+        tagCounts = await db
+          .select({
+            tag_id: illustTagsTable.tag_id,
+            illust_id: illustTagsTable.illust_id,
+          })
+          .from(illustTagsTable)
+          .where(inArray(illustTagsTable.illust_id, illustIds))
+          .execute()
       } else {
         // For large result sets, we'll query in batches and combine
-        const allTagCounts = [];
+        const allTagCounts: { tag_id: number; illust_id: number }[] = [];
         for (let i = 0; i < illustIds.length; i += SQLITE_PARAMS_LIMIT) {
           const batchIds = illustIds.slice(i, i + SQLITE_PARAMS_LIMIT);
           const batchResults = await db
@@ -270,7 +282,8 @@ export const getTagCounts = async (
               illust_id: illustTagsTable.illust_id,
             })
             .from(illustTagsTable)
-            .where(inArray(illustTagsTable.illust_id, batchIds));
+            .where(inArray(illustTagsTable.illust_id, batchIds))
+            .execute();
           
           allTagCounts.push(...batchResults);
         }
@@ -284,14 +297,15 @@ export const getTagCounts = async (
         
         // Get tag details - in batches if needed
         const tagIds = Array.from(countByTagId.keys());
-        let allTagDetails = [];
+        let allTagDetails: { id: number; name: string; translated_name: string | null }[] = [];
         
         for (let i = 0; i < tagIds.length; i += SQLITE_PARAMS_LIMIT) {
           const batchIds = tagIds.slice(i, i + SQLITE_PARAMS_LIMIT);
           const batchResults = await db
             .select()
             .from(tagsTable)
-            .where(inArray(tagsTable.id, batchIds));
+            .where(inArray(tagsTable.id, batchIds))
+            .execute();
             
           allTagDetails.push(...batchResults);
         }
@@ -316,8 +330,16 @@ export const getTagCounts = async (
     }
   }
   
-  // For smaller queries that don't need batching
-  const tagCounts = await tagsQuery
+  // For queries without selected tags
+  if (tagCounts.length === 0) {
+    tagCounts = await db
+      .select({
+        tag_id: illustTagsTable.tag_id,
+        illust_id: illustTagsTable.illust_id,
+      })
+      .from(illustTagsTable)
+      .execute()
+  }
   
   // Count occurrences of each tag
   const countByTagId = new Map<number, number>()
@@ -330,18 +352,20 @@ export const getTagCounts = async (
   const tagIds = Array.from(countByTagId.keys())
   
   // Process tag details in batches if needed
-  let tagDetails = [];
+  let tagDetails: { id: number; name: string; translated_name: string | null }[] = [];
   if (tagIds.length <= SQLITE_PARAMS_LIMIT) {
     tagDetails = await db
       .select()
       .from(tagsTable)
-      .where(inArray(tagsTable.id, tagIds));
+      .where(inArray(tagsTable.id, tagIds))
+      .execute();
   } else {
     tagDetails = await batchedQuery(tagIds, async (batchIds) => {
       return db
         .select()
         .from(tagsTable)
-        .where(inArray(tagsTable.id, batchIds));
+        .where(inArray(tagsTable.id, batchIds))
+        .execute();
     });
   }
   
