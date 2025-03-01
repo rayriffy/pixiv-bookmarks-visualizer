@@ -9,7 +9,9 @@
     "start": "next start",
     "build:data": "node -r @swc-node/register tools/fetcher.ts",
     "build:image": "node -r @swc-node/register tools/preloadImage.ts",
-    "build:ugoira": "node -r @swc-node/register tools/ugoira.ts"
+    "build:ugoira": "node -r @swc-node/register tools/ugoira.ts",
+    "db:init": "drizzle-kit push",
+    "db:migrate": "node -r @swc-node/register tools/migrateToSqlite.ts"
   },
   "keywords": [],
   "author": "",
@@ -37,6 +39,7 @@
     "web-api-hooks": "3.0.2"
   },
   "devDependencies": {
+    "@libsql/client": "^0.14.0",
     "@swc-node/register": "1.10.9",
     "@tailwindcss/forms": "0.5.7",
     "@types/lodash": "4.17.16",
@@ -44,6 +47,8 @@
     "@types/react": "18.3.3",
     "@types/react-dom": "18.3.0",
     "daisyui": "^5.0.0",
+    "drizzle-kit": "^0.30.5",
+    "drizzle-orm": "^0.40.0",
     "p-queue": "6.6.2",
     "prettier": "3.5.2",
     "typescript": "5.8.2"
