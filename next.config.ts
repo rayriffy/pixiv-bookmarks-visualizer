@@ -10,6 +10,9 @@ const nextConfig: NextConfig = {
       },
     ]
   },
+  experimental: {
+    reactCompiler: true,
+  },
   output: process.env.STANDALONE === 'true' ? 'standalone' : undefined,
 }
 
