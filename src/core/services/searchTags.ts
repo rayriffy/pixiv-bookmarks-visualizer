@@ -183,7 +183,7 @@ export async function searchTags(
     // Only add if this tag name isn't already in our map, or if it has a higher count
     if (
       !uniqueTags.has(tag.name) ||
-      tagCountsMap[tag.id] > uniqueTags.get(tag.name)?.count
+      tagCountsMap[tag.id] > (uniqueTags.get(tag.name)?.count ?? 0)
     ) {
       uniqueTags.set(tag.name, {
         name: {

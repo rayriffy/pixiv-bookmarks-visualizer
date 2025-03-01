@@ -34,7 +34,7 @@ const api: NextApiHandler = async (req, res) => {
         )
       ).find(o => o.id === Number(illustId))?.image_urls.medium
 
-      imageData = await getPixivImageAndCache(targetUrl)
+      imageData = await getPixivImageAndCache(targetUrl!)
     }
 
     sendBinaryResponse(res, imageData)
