@@ -42,6 +42,7 @@ function dbResultToPixivIllust(result: any): ExtendedPixivIllust {
       account: result.users.account,
       profile_image_urls: JSON.parse(result.users.profile_image_urls),
       is_followed: result.users.is_followed,
+      comment: '',
     },
     tags: result.tags.map((tag: any) => ({
       name: tag.name,
@@ -75,9 +76,9 @@ export async function searchIllusts(searchRequest: SearchRequest) {
 
   // 2. Restriction filter
   if (searchRequest.restrict === 'public') {
-    filters.push(eq(illustsTable.bookmark_private, 0))
+    filters.push(eq(illustsTable.bookmark_private, false))
   } else if (searchRequest.restrict === 'private') {
-    filters.push(eq(illustsTable.bookmark_private, 1))
+    filters.push(eq(illustsTable.bookmark_private, true))
   }
 
   // 3. Aspect ratio filter
