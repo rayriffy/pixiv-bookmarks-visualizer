@@ -11,14 +11,11 @@ importers:
       '@heroicons/react':
         specifier: 2.2.0
         version: 2.2.0(react@18.3.1)
-      '@nanostores/react':
-        specifier: 0.8.4
-        version: 0.8.4(nanostores@0.11.4)(react@18.3.1)
       '@next/bundle-analyzer':
         specifier: 15.2.0
         version: 15.2.0
       '@tailwindcss/postcss':
-        specifier: ^4.0.9
+        specifier: 4.0.9
         version: 4.0.9
       destr:
         specifier: 2.0.3
@@ -63,14 +60,14 @@ importers:
         specifier: 2.3.2
         version: 2.3.2(react@18.3.1)
       tailwindcss:
-        specifier: ^4.0.9
+        specifier: 4.0.9
         version: 4.0.9
       web-api-hooks:
         specifier: 3.0.2
         version: 3.0.2(react@18.3.1)
     devDependencies:
       '@libsql/client':
-        specifier: ^0.14.0
+        specifier: 0.14.0
         version: 0.14.0
       '@swc-node/register':
         specifier: 1.10.9
@@ -91,13 +88,13 @@ importers:
         specifier: 18.3.0
         version: 18.3.0
       daisyui:
-        specifier: ^5.0.0
+        specifier: 5.0.0
         version: 5.0.0
       drizzle-kit:
-        specifier: ^0.30.5
+        specifier: 0.30.5
         version: 0.30.5
       drizzle-orm:
-        specifier: ^0.40.0
+        specifier: 0.40.0
         version: 0.40.0(@libsql/client@0.14.0)(gel@2.0.0)
       p-queue:
         specifier: 6.6.2
@@ -682,13 +679,6 @@ packages:
     resolution: {integrity: sha512-7pJzOWzPm6oJUxml+PCDRzYQ4A1hTMHAciTAHfFK4fkbDZX33nWPVG7Y3vqdKtslcwAzwmrNDc6sXy2nwWnbiw==}
     cpu: [x64]
     os: [win32]
-
-  '@nanostores/react@0.8.4':
-    resolution: {integrity: sha512-EciHSzDXg7GmGODjegGG1VldPEinbAK+12/Uz5+MAdHmxf082Rl6eXqKFxAAu4pZAcr5dNTpv6wMfEe7XacjkQ==}
-    engines: {node: ^18.0.0 || >=20.0.0}
-    peerDependencies:
-      nanostores: ^0.9.0 || ^0.10.0 || ^0.11.0
-      react: '>=18.0.0'
 
   '@napi-rs/wasm-runtime@0.2.4':
     resolution: {integrity: sha512-9zESzOO5aDByvhIAsOy9TbpZ0Ur2AJbUI7UT73kcUTS2mxAMHOBaa1st/jAymNoCtvrit99kkzT1FZuXVcgfIQ==}
@@ -2616,11 +2606,6 @@ snapshots:
 
   '@libsql/win32-x64-msvc@0.4.7':
     optional: true
-
-  '@nanostores/react@0.8.4(nanostores@0.11.4)(react@18.3.1)':
-    dependencies:
-      nanostores: 0.11.4
-      react: 18.3.1
 
   '@napi-rs/wasm-runtime@0.2.4':
     dependencies:
