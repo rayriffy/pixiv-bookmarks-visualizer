@@ -4,7 +4,6 @@ import { getIllusts } from '../../core/services/getIllusts'
 import { aspectFilter } from '../../modules/search/services/aspectFilter'
 import { restrictionFilter } from '../../modules/search/services/restrictionFilter'
 import { sizeFilter } from '../../modules/search/services/sizeFilter'
-import { supporterFilter } from '../../modules/search/services/supporterFilter'
 import { tagFilter } from '../../modules/search/services/tagFilter'
 import { pageCountFilter } from '../../modules/search/services/pageCountFilter'
 
@@ -44,7 +43,9 @@ const api: NextApiHandler = async (req, res) => {
 
   const tags = filteredIllusts.reduce<Record<string, Tag>>((acc, illust) => {
     for (const tag of illust.tags)
-      if (acc[tag.name] === undefined)
+      if (includedTags.some(t => t === tag.name) || excludedTags.some(t => t === tag.name))
+        continue
+      else if (acc[tag.name] === undefined)
         acc[tag.name] = {
           name: {
             original: tag.name,
