@@ -1,16 +1,15 @@
 import { NextApiHandler } from 'next'
 
 import { getPixivImageAndCache } from '../../core/services/getPixivImageAndCache'
+import { handleProxyError, sendBinaryResponse } from '../../core/services/proxyUtils'
 
 const api: NextApiHandler = async (req, res) => {
   try {
     const url = req.query.url as string
-
-    res.status(200).send(await getPixivImageAndCache(url))
-    res.end()
-  } catch (e) {
-    res.status(500).send('Internal Server Error')
-    res.end()
+    const imageData = await getPixivImageAndCache(url)
+    sendBinaryResponse(res, imageData)
+  } catch (error) {
+    handleProxyError(res, error)
   }
 }
 

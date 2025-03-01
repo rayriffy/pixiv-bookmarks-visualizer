@@ -5,6 +5,7 @@ import { NextApiHandler } from 'next'
 import destr from 'destr'
 
 import { getPixivImageAndCache } from '../../core/services/getPixivImageAndCache'
+import { handleProxyError, sendBinaryResponse } from '../../core/services/proxyUtils'
 
 import { ExtendedPixivIllust } from '../../core/@types/ExtendedPixivIllust'
 
@@ -13,14 +14,15 @@ const ugoiraCacheDirectory = path.join(process.cwd(), '.next/cache/ugoiraProxy')
 const api: NextApiHandler = async (req, res) => {
   try {
     const illustId = req.query.illustId as string
-
     const expectedCachePath = path.join(
       ugoiraCacheDirectory,
       `${illustId}.webp`
     )
 
+    let imageData: Buffer
+
     if (fs.existsSync(path.join(expectedCachePath))) {
-      res.status(200).send(Buffer.from(await fs.promises.readFile(expectedCachePath)))
+      imageData = Buffer.from(await fs.promises.readFile(expectedCachePath))
     } else {
       const targetUrl = (
         destr<ExtendedPixivIllust[]>(
@@ -30,13 +32,13 @@ const api: NextApiHandler = async (req, res) => {
           )
         )
       ).find(o => o.id === Number(illustId))!.image_urls.medium
-      res.status(200).send(await getPixivImageAndCache(targetUrl))
+      
+      imageData = await getPixivImageAndCache(targetUrl)
     }
 
-    res.end()
-  } catch (e) {
-    res.status(500).send('Internal Server Error')
-    res.end()
+    sendBinaryResponse(res, imageData)
+  } catch (error) {
+    handleProxyError(res, error)
   }
 }
 
