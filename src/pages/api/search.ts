@@ -1,5 +1,4 @@
 import { NextApiHandler } from 'next'
-import { chunk } from 'lodash'
 
 import { getIllusts } from '../../core/services/getIllusts'
 import { aspectFilter } from '../../modules/search/services/aspectFilter'
@@ -12,6 +11,7 @@ import { pageCountFilter } from '../../modules/search/services/pageCountFilter'
 import { SearchRequest } from '../../core/@types/api/SearchRequest'
 import { SearchResult } from '../../core/@types/api/SearchResult'
 import { aiFilter } from '../../modules/search/services/aiFilter'
+import { Tag } from '../../core/@types/api/TagSearchResponse'
 
 const api: NextApiHandler = async (req, res) => {
   const illusts = await getIllusts()
@@ -42,14 +42,32 @@ const api: NextApiHandler = async (req, res) => {
     .filter(aiFilter(searchRequest))
   //.filter(supporterFilter(searchRequest)) // Broken support
 
-  const illustChunks = chunk(filteredIllusts, 30)
+  const tags = filteredIllusts.reduce<Record<string, Tag>>((acc, illust) => {
+    for (const tag of illust.tags)
+      if (acc[tag.name] === undefined)
+        acc[tag.name] = {
+          name: {
+            original: tag.name,
+            translated: tag.translated_name,
+          },
+          count: 1
+        }
+      else
+        acc[tag.name].count++
+
+    return acc
+  }, {})
 
   const payload: SearchResult = {
-    illusts: illustChunks[targetPage - 1] ?? [],
+    illusts: filteredIllusts.slice(
+      (targetPage - 1) * 30,
+      targetPage * 30
+    ),
+    tags: Object.values(tags).sort((a, b) => b.count - a.count).slice(0, 10),
     count: filteredIllusts.length,
     paginate: {
       current: targetPage,
-      max: illustChunks.length,
+      max: Math.ceil(filteredIllusts.length / 30),
     },
   }
 

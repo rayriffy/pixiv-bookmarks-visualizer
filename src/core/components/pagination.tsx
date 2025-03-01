@@ -1,38 +1,15 @@
 import { memo } from 'react'
 
 import Link from 'next/link'
+import { classNames } from './classNames'
 
 interface Props {
   max: number
   current: number
-  link?: boolean
-  onChange?(page: number): void
 }
-
-interface PageProps {
-  startPoint: number
-  current: number
-  i: number
-  onChange(page: number): void
-}
-
-const Page = memo<PageProps>(props => {
-  const { startPoint, current, i, onChange } = props
-
-  return (
-    <div
-      className={`cursor-pointer p-1 border rounded-md h-full aspect-square text-center ${
-        startPoint + i + 1 === current ? 'text-gray-900' : 'text-gray-500'
-      }`}
-      onClick={() => onChange(startPoint + i + 1)}
-    >
-      {startPoint + i + 1}
-    </div>
-  )
-})
 
 export const Pagination = memo<Props>(props => {
-  const { max, current, link = true, onChange } = props
+  const { max, current } = props
 
   const pageLength: number = max > 5 ? 5 : max
   const startPoint: number =
@@ -45,32 +22,19 @@ export const Pagination = memo<Props>(props => {
       : 0
 
   return (
-    <div className="flex justify-center py-8 space-x-6 sm:space-x-8">
-      {Array.from({ length: pageLength }, (_, i) => (
-        <div
-          key={`pagination-${startPoint + i}`}
-          className="text-md sm:text-lg"
-        >
-          {link ? (
-            (<Link
-              href={startPoint + i === 0 ? '/' : `/${startPoint + i + 1}`}
-              aria-label={`${startPoint + i + 1}`}
-            >
+    <div className="flex justify-center py-8">
+      <div className="join">
+        {Array.from({ length: pageLength }, (_, i) => (
+          <Link
+            key={`pagination-${startPoint + i}`}
+            href={startPoint + i === 0 ? '/' : `/${startPoint + i + 1}`}
+            className={classNames("join-item btn", current === startPoint + i + 1 ? "btn-active" : "")}
+          >
+            {startPoint + i + 1}
+          </Link>
+        ))}
+      </div>
 
-              <Page
-                {...{ startPoint, i, current }}
-                onChange={page => (onChange ? onChange(page) : null)}
-              />
-
-            </Link>)
-          ) : (
-            <Page
-              {...{ startPoint, i, current }}
-              onChange={page => (onChange ? onChange(page) : null)}
-            />
-          )}
-        </div>
-      ))}
     </div>
   );
 })

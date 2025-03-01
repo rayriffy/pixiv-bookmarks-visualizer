@@ -1,4 +1,4 @@
-import { Fragment, useState } from 'react'
+import { useState } from 'react'
 
 import { NextPage } from 'next'
 import { AppProps } from 'next/app'
@@ -8,9 +8,10 @@ import { SWRConfig } from 'swr'
 
 import { SearchBarContext } from '../context/SearchBarContext'
 import { minimumSizer } from '../context/defaults/minimumSizer'
-import { SearchBar } from '../modules/searchBar/components'
-
 import { MinimumSizer } from '../core/@types/MinimumSizer'
+import {
+  SearchFilters
+} from '../modules/searchFilters/components/SearchFilters'
 
 import '../styles/tailwind.css'
 
@@ -49,10 +50,7 @@ const App: NextPage<AppProps> = props => {
           maximumPageCount: maximumPageCount,
         }}
       >
-        <main className="max-w-7xl mx-auto px-4 py-8">
-          <SearchBar />
-          <Component {...pageProps} />
-        </main>
+        <Component {...pageProps} />
       </SearchBarContext.Provider>
     </SWRConfig>
   )

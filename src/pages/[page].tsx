@@ -1,7 +1,7 @@
 import { NextPage } from 'next'
 import { useRouter } from 'next/router'
 
-import { useMemo, useContext } from 'react'
+import { useMemo, useContext, useState } from 'react'
 import useSWR from 'swr'
 
 import { buildURLParams } from '../core/services/buildURLParams'
@@ -11,6 +11,10 @@ import { Illust } from '../modules/illust/components/illust'
 
 import { SearchRequest } from '../core/@types/api/SearchRequest'
 import { SearchResult } from '../core/@types/api/SearchResult'
+import {
+  SearchFilters
+} from '../modules/searchFilters/components/SearchFilters'
+import { TopTags } from '../modules/topTags/component/TopTags'
 
 const Page: NextPage = props => {
   const { query } = useRouter()
@@ -52,34 +56,40 @@ const Page: NextPage = props => {
   )
 
   return (
-    <div className="py-6">
-      {!data && !error ? (
-        <h1>Loading</h1>
-      ) : error ? (
-        <h1>Failed to fetch</h1>
-      ) : (
-        <section>
-          <div className="my-1">
-            <h2 className="text-sm">
+    <main className={"p-4"}>
+      <section className={"grid md:grid-cols-2 lg:grid-cols-4 gap-4"}>
+        <SearchFilters />
+        <TopTags tags={data?.tags ?? []} />
+      </section>
+      <div className="py-6">
+        {!data && !error ? (
+          <h1>Loading</h1>
+        ) : error ? (
+          <h1>Failed to fetch</h1>
+        ) : (
+          <section>
+            <div className="my-1">
+              <h2 className="text-sm">
               <span className="font-bold">
                 {(data!.count ?? -1).toLocaleString()} images
               </span>{' '}
-              found, with a total of{' '}
-              <span className="font-bold">
+                found, with a total of{' '}
+                <span className="font-bold">
                 {data!.paginate.max.toLocaleString()} pages
               </span>
-            </h2>
-          </div>
-          <Pagination {...data!.paginate} />
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-x-6 gap-y-12 items-center">
-            {data!.illusts.map(illust => (
-              <Illust key={`illust-${illust.id}`} illust={illust} />
-            ))}
-          </div>
-          <Pagination {...data!.paginate} />
-        </section>
-      )}
-    </div>
+              </h2>
+            </div>
+            <Pagination {...data!.paginate} />
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-x-6 gap-y-12 items-center">
+              {data!.illusts.map(illust => (
+                <Illust key={`illust-${illust.id}`} illust={illust} />
+              ))}
+            </div>
+            <Pagination {...data!.paginate} />
+          </section>
+        )}
+      </div>
+    </main>
   )
 }
 
