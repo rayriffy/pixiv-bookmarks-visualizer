@@ -95,6 +95,7 @@ export const TagSeachBar = memo(() => {
       </label>
       <Async
         isMulti
+        placeholder={"Include tags..."}
         loadOptions={includedTagLoadOptions}
         isLoading={loadingIncludedTags}
         onChange={val => setIncludeTags(val.map(o => o.value))}
@@ -110,6 +111,7 @@ export const TagSeachBar = memo(() => {
       />
       <Async
         isMulti
+        placeholder={"Exclude tags..."}
         loadOptions={excludedTagLoadOptions}
         isLoading={loadingExcludedTags}
         onChange={val => setExcludeTags(val.map(o => o.value))}

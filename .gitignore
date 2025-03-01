@@ -180,3 +180,5 @@ public/workbox*
 public/~partytown
 
 lib/
+
+.idea
