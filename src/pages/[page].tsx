@@ -66,19 +66,17 @@ const Page: NextPage = props => {
   // Update tag counts when top tags data changes
   useEffect(() => {
     if (topTagsResponse?.tags && topTagsResponse.tags.length > 0) {
-      // Update include tags counts
+      // Update include tags counts - use functional update to avoid closure issues
       if (includeTags.length > 0) {
-        const updatedIncludeTags = updateTagCounts(includeTags, topTagsResponse.tags);
-        setIncludeTags(updatedIncludeTags);
+        setIncludeTags(prev => updateTagCounts(prev, topTagsResponse.tags));
       }
       
-      // Update exclude tags counts
+      // Update exclude tags counts - use functional update to avoid closure issues
       if (excludeTags.length > 0) {
-        const updatedExcludeTags = updateTagCounts(excludeTags, topTagsResponse.tags);
-        setExcludeTags(updatedExcludeTags);
+        setExcludeTags(prev => updateTagCounts(prev, topTagsResponse.tags));
       }
     }
-  }, [topTagsResponse, includeTags, excludeTags, setIncludeTags, setExcludeTags]);
+  }, [topTagsResponse, setIncludeTags, setExcludeTags]);
 
   return (
     <main className={"p-4"}>
