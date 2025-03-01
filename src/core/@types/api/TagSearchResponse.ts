@@ -1,9 +1,13 @@
+
+export interface Tag {
+  name: {
+    original: string
+    translated: string | null
+  }
+  count: number
+}
+
+
 export interface TagSearchResponse {
-  tags: {
-    name: {
-      original: string
-      translated: string | null
-    }
-    count: number
-  }[]
+  tags: Tag[]
 }

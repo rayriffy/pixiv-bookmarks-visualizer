@@ -7,9 +7,11 @@ import { restrictionFilter } from '../../modules/search/services/restrictionFilt
 import { sizeFilter } from '../../modules/search/services/sizeFilter'
 import { supporterFilter } from '../../modules/search/services/supporterFilter'
 import { tagFilter } from '../../modules/search/services/tagFilter'
+import { pageCountFilter } from '../../modules/search/services/pageCountFilter'
 
 import { SearchRequest } from '../../core/@types/api/SearchRequest'
 import { SearchResult } from '../../core/@types/api/SearchResult'
+import { aiFilter } from '../../modules/search/services/aiFilter'
 
 const api: NextApiHandler = async (req, res) => {
   const illusts = await getIllusts()
@@ -17,18 +19,28 @@ const api: NextApiHandler = async (req, res) => {
   const searchRequest = req.query as unknown as SearchRequest
   const targetPage = Number(searchRequest.page)
 
-  const searchTags =
-    searchRequest.tags === undefined
+  const includedTags =
+    searchRequest.includeTags === undefined
       ? []
-      : typeof searchRequest.tags === 'string'
-      ? [searchRequest.tags]
-      : searchRequest.tags
+      : typeof searchRequest.includeTags === 'string'
+        ? [searchRequest.includeTags]
+        : searchRequest.includeTags
+
+  const excludedTags =
+    searchRequest.excludeTags === undefined
+      ? []
+      : typeof searchRequest.excludeTags === 'string'
+        ? [searchRequest.excludeTags]
+        : searchRequest.excludeTags
 
   const filteredIllusts = illusts
     .filter(restrictionFilter(searchRequest))
     .filter(aspectFilter(searchRequest))
     .filter(sizeFilter(searchRequest))
-    .filter(tagFilter(searchTags))
+    .filter(tagFilter(includedTags, excludedTags))
+    .filter(pageCountFilter(searchRequest))
+    .filter(aiFilter(searchRequest))
+  //.filter(supporterFilter(searchRequest)) // Broken support
 
   const illustChunks = chunk(filteredIllusts, 30)
 
