@@ -4,7 +4,6 @@ import destr from 'destr'
 import { createClient } from '@libsql/client'
 import { drizzle } from 'drizzle-orm/libsql'
 import dotenv from 'dotenv'
-import crypto from 'node:crypto'
 
 import {
   illustsTable,

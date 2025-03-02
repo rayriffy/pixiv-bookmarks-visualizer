@@ -5,15 +5,17 @@ export const Aspect = () => {
   const { aspect, setAspect } = useSearchParams()
   const isFirstRender = useRef(true)
   const isHandlingChange = useRef(false)
-  
+
   // Initialize local state based on aspect value
-  const [toggleHorizontal, setToggleHorizontal] = useState(aspect === 'horizontal')
+  const [toggleHorizontal, setToggleHorizontal] = useState(
+    aspect === 'horizontal'
+  )
   const [toggleVertical, setToggleVertical] = useState(aspect === 'vertical')
 
   // Update local state when aspect changes from URL
   useEffect(() => {
     if (isHandlingChange.current) return
-    
+
     setToggleHorizontal(aspect === 'horizontal')
     setToggleVertical(aspect === 'vertical')
   }, [aspect])
@@ -22,10 +24,10 @@ export const Aspect = () => {
     (variant: 'horizontal' | 'vertical') =>
     (event: ChangeEvent<HTMLInputElement>) => {
       isHandlingChange.current = true
-      
+
       if (variant === 'horizontal') setToggleHorizontal(event.target.checked)
       else setToggleVertical(event.target.checked)
-      
+
       // Reset the flag after a small delay to allow state updates to complete
       setTimeout(() => {
         isHandlingChange.current = false
@@ -38,10 +40,10 @@ export const Aspect = () => {
       isFirstRender.current = false
       return
     }
-    
+
     // Skip if we're not handling a user change
     if (!isHandlingChange.current) return
-    
+
     const selectedMode =
       toggleHorizontal === toggleVertical
         ? 'all'

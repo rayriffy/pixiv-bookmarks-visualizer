@@ -1,12 +1,9 @@
-import { SQL, and, count, eq, inArray, ilike, like, not, or, sql } from 'drizzle-orm'
+import { type SQL, and, count, eq, inArray, not, or, sql } from 'drizzle-orm'
 import type { TagSearchRequest } from '../@types/api/TagSearchRequest'
 import type { Tag, TagSearchResponse } from '../@types/api/TagSearchResponse'
 import { getDbClient } from '../../db/connect'
 import { illustTagsTable, tagsTable } from '../../db/schema'
 import { batchedQuery } from './dbUtils'
-
-// SQLite parameter limit
-const SQLITE_PARAMS_LIMIT = 500
 
 /**
  * Optimized tag search function using Drizzle ORM with index-aware queries
@@ -23,7 +20,7 @@ export async function searchTags(
     : typeof request.selectedTags === 'string'
       ? [request.selectedTags]
       : []
-      
+
   // Get already selected tags (to exclude them from results)
   const alreadySelectedTags = Array.isArray(request.alreadySelectedTags)
     ? request.alreadySelectedTags
@@ -122,10 +119,10 @@ export async function searchTags(
         })
         .from(tagsTable)
         .where(inArray(tagsTable.id, batchIds))
-      
+
       // Apply text search if needed
       const whereConditions: SQL[] = [inArray(tagsTable.id, batchIds)]
-      
+
       if (query) {
         const lowerQuery = `%${query.toLowerCase()}%`
         const searchClause = or(
@@ -134,13 +131,13 @@ export async function searchTags(
         )
         whereConditions.push(searchClause)
       }
-      
+
       // Exclude already selected tags
       if (alreadySelectedTags.length > 0) {
         const excludeClause = not(inArray(tagsTable.name, alreadySelectedTags))
         whereConditions.push(excludeClause)
       }
-      
+
       // Build final query with all conditions
       return db
         .select({
@@ -199,7 +196,7 @@ export async function searchTags(
     if (alreadySelectedTags.includes(tag.name)) {
       return
     }
-    
+
     // Only add if this tag name isn't already in our map, or if it has a higher count
     if (
       !uniqueTags.has(tag.name) ||

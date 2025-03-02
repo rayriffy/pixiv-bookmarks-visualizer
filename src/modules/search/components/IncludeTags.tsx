@@ -4,7 +4,9 @@ import { useRef } from 'react'
 import dynamic from 'next/dynamic'
 import type { TagItem } from '../../../core/@types/TagItem'
 
-const TagSelector = dynamic(() => import('./TagSelector').then(o => o.TagSelector))
+const TagSelector = dynamic(() =>
+  import('./TagSelector').then(o => o.TagSelector)
+)
 
 export const IncludeTags = () => {
   const { includeTags, excludeTags, setIncludeTags } = useSearchParams()
@@ -12,17 +14,20 @@ export const IncludeTags = () => {
 
   // Use the custom hook for tag search, passing both include and exclude tags
   // so we don't suggest tags that are already selected in either category
-  const loadOptions = useTagSearch(includeTags, [...includeTags, ...excludeTags])
+  const loadOptions = useTagSearch(includeTags, [
+    ...includeTags,
+    ...excludeTags,
+  ])
 
   // Wrapper for setIncludeTags to ensure clean updates
   const handleTagsChange = (newTags: TagItem[]) => {
     if (isUpdating.current) return
-    
+
     isUpdating.current = true
-    
+
     try {
       // Ensure we're calling with a properly defined array, even if empty
-      setIncludeTags(newTags || []);
+      setIncludeTags(newTags || [])
     } finally {
       // Reset after a delay
       setTimeout(() => {

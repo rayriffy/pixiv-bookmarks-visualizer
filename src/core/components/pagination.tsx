@@ -13,7 +13,7 @@ export const Pagination = memo<Props>(props => {
   const { max, current } = props
   const router = useRouter()
   const [searchParams, setSearchParams] = useState('')
-  
+
   // Get current search parameters to preserve them when changing pages
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -37,13 +37,13 @@ export const Pagination = memo<Props>(props => {
         {Array.from({ length: pageLength }, (_, i) => {
           const pageNum = startPoint + i + 1
           const path = pageNum === 1 ? '/' : `/${pageNum}`
-          
+
           // Preserve search params when changing page
           const href = {
             pathname: path,
             search: searchParams,
           }
-          
+
           return (
             <Link
               key={`pagination-${startPoint + i}`}

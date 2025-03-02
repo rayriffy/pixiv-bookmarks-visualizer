@@ -101,22 +101,3 @@ export function mapUsersByIllustId(
 
   return usersByIllustId
 }
-
-/**
- * Convert tag counts to Tag type for API response
- */
-export function convertToTagResponse(
-  tagCounts: Map<string, { tag: any; count: number }>,
-  limit = 10
-): Tag[] {
-  return Array.from(tagCounts.values())
-    .map(({ tag, count }) => ({
-      name: {
-        original: tag.name,
-        translated: tag.translated_name,
-      },
-      count,
-    }))
-    .sort((a, b) => b.count - a.count)
-    .slice(0, limit)
-}

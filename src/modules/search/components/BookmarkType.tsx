@@ -5,7 +5,7 @@ export const BookmarkType = () => {
   const { restriction, setRestriction } = useSearchParams()
   const isFirstRender = useRef(true)
   const isHandlingChange = useRef(false)
-  
+
   // Initialize local state based on restriction value
   const [togglePublic, setTogglePublic] = useState(
     restriction === 'public' || restriction === 'all'
@@ -17,7 +17,7 @@ export const BookmarkType = () => {
   // Update local state when restriction changes from URL
   useEffect(() => {
     if (isHandlingChange.current) return
-    
+
     setTogglePublic(restriction === 'public' || restriction === 'all')
     setTogglePrivate(restriction === 'private' || restriction === 'all')
   }, [restriction])
@@ -26,10 +26,10 @@ export const BookmarkType = () => {
     (variant: 'public' | 'private') =>
     (event: ChangeEvent<HTMLInputElement>) => {
       isHandlingChange.current = true
-      
+
       if (variant === 'public') setTogglePublic(event.target.checked)
       else setTogglePrivate(event.target.checked)
-      
+
       // Reset the flag after a small delay to allow state updates to complete
       setTimeout(() => {
         isHandlingChange.current = false
@@ -42,10 +42,10 @@ export const BookmarkType = () => {
       isFirstRender.current = false
       return
     }
-    
+
     // Skip if we're handling a change from the URL
     if (!isHandlingChange.current) return
-    
+
     const selectedMode =
       togglePublic === togglePrivate
         ? 'all'

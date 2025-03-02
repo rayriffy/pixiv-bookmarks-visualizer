@@ -1,15 +1,15 @@
-import { useRef, useEffect } from 'react'
+import { useRef, type ChangeEvent } from 'react'
 import { useSearchParams } from '../../../hooks/useSearchParams'
 
 export const SafeForWork = () => {
   const { blur, setBlur } = useSearchParams()
   const isHandlingChange = useRef(false)
-  
+
   // To prevent double-render issues with checkboxes
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     isHandlingChange.current = true
     setBlur(e.target.checked)
-    
+
     // Reset flag after a delay
     setTimeout(() => {
       isHandlingChange.current = false

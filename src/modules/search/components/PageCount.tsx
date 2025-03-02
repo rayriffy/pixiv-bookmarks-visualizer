@@ -2,45 +2,51 @@ import { type ChangeEventHandler, useCallback, useRef } from 'react'
 import { useSearchParams } from '../../../hooks/useSearchParams'
 
 export const PageCount = () => {
-  const { 
-    minimumPageCount, 
+  const {
+    minimumPageCount,
     setMinimumPageCount,
-    maximumPageCount, 
-    setMaximumPageCount 
+    maximumPageCount,
+    setMaximumPageCount,
   } = useSearchParams()
-  
+
   const isHandlingMinChange = useRef(false)
   const isHandlingMaxChange = useRef(false)
 
   const onMinimumValueChange = useCallback<
     ChangeEventHandler<HTMLInputElement>
-  >(({ target: { value } }) => {
-    isHandlingMinChange.current = true
-    
-    // Handle empty string explicitly to allow clearing the input
-    const newValue = value === '' ? '0' : value
-    setMinimumPageCount(newValue)
-    
-    // Reset the flag after a small delay
-    setTimeout(() => {
-      isHandlingMinChange.current = false
-    }, 50)
-  }, [setMinimumPageCount])
+  >(
+    ({ target: { value } }) => {
+      isHandlingMinChange.current = true
+
+      // Handle empty string explicitly to allow clearing the input
+      const newValue = value === '' ? '0' : value
+      setMinimumPageCount(newValue)
+
+      // Reset the flag after a small delay
+      setTimeout(() => {
+        isHandlingMinChange.current = false
+      }, 50)
+    },
+    [setMinimumPageCount]
+  )
 
   const onMaximumValueChange = useCallback<
     ChangeEventHandler<HTMLInputElement>
-  >(({ target: { value } }) => {
-    isHandlingMaxChange.current = true
-    
-    // Handle empty string explicitly to allow clearing the input
-    const newValue = value === '' ? '0' : value
-    setMaximumPageCount(newValue)
-    
-    // Reset the flag after a small delay
-    setTimeout(() => {
-      isHandlingMaxChange.current = false
-    }, 50)
-  }, [setMaximumPageCount])
+  >(
+    ({ target: { value } }) => {
+      isHandlingMaxChange.current = true
+
+      // Handle empty string explicitly to allow clearing the input
+      const newValue = value === '' ? '0' : value
+      setMaximumPageCount(newValue)
+
+      // Reset the flag after a small delay
+      setTimeout(() => {
+        isHandlingMaxChange.current = false
+      }, 50)
+    },
+    [setMaximumPageCount]
+  )
 
   return (
     <>

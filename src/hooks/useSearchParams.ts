@@ -1,6 +1,9 @@
 import { useRouter } from 'next/router'
 import { useState, useEffect, useCallback, useRef } from 'react'
-import { serializeFiltersToURL, deserializeURLToFilters } from '../core/services/buildURLParams'
+import {
+  serializeFiltersToURL,
+  deserializeURLToFilters,
+} from '../core/services/buildURLParams'
 import { minimumSizer as defaultMinimumSizer } from '../core/constants/minimumSizer'
 import type { MinimumSizer } from '../core/@types/MinimumSizer'
 
@@ -26,7 +29,7 @@ export function updateTagCounts(
     { count: number; translated: string | null }
   >()
 
-  topTags.forEach((tag) => {
+  topTags.forEach(tag => {
     tagCountMap.set(tag.name.original, {
       count: tag.count,
       translated: tag.name.translated,
@@ -34,7 +37,7 @@ export function updateTagCounts(
   })
 
   // Update existing tags with new counts if available
-  return existingTags.map((tag) => {
+  return existingTags.map(tag => {
     const updatedInfo = tagCountMap.get(tag.name)
     if (updatedInfo) {
       return {
@@ -55,9 +58,12 @@ export function useSearchParams() {
   // State for all filter types
   const [includeTags, setIncludeTags] = useState<TagItem[]>([])
   const [excludeTags, setExcludeTags] = useState<TagItem[]>([])
-  const [restriction, setRestriction] = useState<'all' | 'public' | 'private'>('public')
+  const [restriction, setRestriction] = useState<'all' | 'public' | 'private'>(
+    'public'
+  )
   const [aspect, setAspect] = useState<'all' | 'horizontal' | 'vertical'>('all')
-  const [minimumSizer, setMinimumSizer] = useState<MinimumSizer>(defaultMinimumSizer)
+  const [minimumSizer, setMinimumSizer] =
+    useState<MinimumSizer>(defaultMinimumSizer)
   const [blur, setBlur] = useState<boolean>(false)
   const [aiMode, setAiMode] = useState<'all' | 'non-ai-only' | 'ai-only'>('all')
   const [minimumPageCount, setMinimumPageCount] = useState<string>('0')
@@ -66,29 +72,29 @@ export function useSearchParams() {
   // Refs to track state
   const isUpdatingFromUrl = useRef(false)
   const pendingUrlUpdate = useRef<NodeJS.Timeout | null>(null)
-  
+
   // Track previous URL to avoid unnecessary updates
   const prevUrlRef = useRef('')
 
   // Initialize state from URL
   useEffect(() => {
     if (!isReady) return
-    
+
     // Skip if we're currently processing an update
     if (isUpdatingFromUrl.current) return
-    
+
     // Skip if URL hasn't changed
     const currentUrl = window.location.href
     if (currentUrl === prevUrlRef.current) return
-    
+
     prevUrlRef.current = currentUrl
     isUpdatingFromUrl.current = true
-    
+
     try {
       const url = new URL(currentUrl)
       const params = new URLSearchParams(url.search)
       const filters = deserializeURLToFilters(params)
-  
+
       // Set states based on URL parameters
       setIncludeTags(filters.includeTags || [])
       setExcludeTags(filters.excludeTags || [])
@@ -112,8 +118,9 @@ export function useSearchParams() {
     if (!isReady || isUpdatingFromUrl.current) return
 
     // Get current page number from router
-    const pageNumber = query.page === undefined ? 1 : Number(query.page as string)
-    
+    const pageNumber =
+      query.page === undefined ? 1 : Number(query.page as string)
+
     // Prepare filter state object
     const filterState = {
       includeTags,
@@ -123,23 +130,25 @@ export function useSearchParams() {
       minimumSizer: minimumSizer.size > 0 ? minimumSizer : undefined,
       blur: blur || undefined,
       aiMode: aiMode !== 'all' ? aiMode : undefined,
-      minimumPageCount: Number(minimumPageCount) > 0 ? Number(minimumPageCount) : undefined,
-      maximumPageCount: Number(maximumPageCount) > 0 ? Number(maximumPageCount) : undefined,
+      minimumPageCount:
+        Number(minimumPageCount) > 0 ? Number(minimumPageCount) : undefined,
+      maximumPageCount:
+        Number(maximumPageCount) > 0 ? Number(maximumPageCount) : undefined,
     }
-    
+
     // Serialize to URL parameters
     const params = serializeFiltersToURL(filterState)
     const newParamsString = params.toString()
-    
+
     // Current URL parameters
     const currentUrl = new URL(window.location.href)
     const currentParams = new URLSearchParams(currentUrl.search)
-    
+
     // Only update if parameters have changed
     if (currentParams.toString() !== newParamsString) {
       // Update the URL reference before pushing to prevent feedback loop
       prevUrlRef.current = `${window.location.origin}/${pageNumber}${newParamsString ? `?${newParamsString}` : ''}`
-      
+
       router.push(
         {
           pathname: `/${pageNumber}`,
@@ -171,7 +180,7 @@ export function useSearchParams() {
       clearTimeout(pendingUrlUpdate.current)
       pendingUrlUpdate.current = null
     }
-    
+
     // Schedule a new update
     pendingUrlUpdate.current = setTimeout(() => {
       pendingUrlUpdate.current = null
@@ -183,7 +192,7 @@ export function useSearchParams() {
   useEffect(() => {
     if (!isReady || isUpdatingFromUrl.current) return
     debouncedUpdateURL()
-    
+
     // Cleanup on unmount
     return () => {
       if (pendingUrlUpdate.current) {
@@ -206,7 +215,8 @@ export function useSearchParams() {
 
   // Create a search payload for API requests
   const searchPayload = useCallback(() => {
-    const pageNumber = query.page === undefined ? 1 : Number(query.page as string)
+    const pageNumber =
+      query.page === undefined ? 1 : Number(query.page as string)
     const includeTagNames = includeTags.map(tag => tag.name)
     const excludeTagNames = excludeTags.map(tag => tag.name)
 

@@ -92,20 +92,20 @@ export const getTopTags = async (
   if (includeTagNameSet.size > 0) {
     // Convert set back to array for the query
     const includeTagNamesArray = Array.from(includeTagNameSet)
-    
+
     // Only query if we have tags to look up
     if (includeTagNamesArray.length > 0) {
       const includeTags = await db
         .select({
           id: tagsTable.id,
-          name: tagsTable.name
+          name: tagsTable.name,
         })
         .from(tagsTable)
         .where(inArray(tagsTable.name, includeTagNamesArray))
 
       // Map of tag name to id
       const includeTagMap = new Map(includeTags.map(tag => [tag.name, tag.id]))
-      
+
       // Build list of include tag IDs
       includeTagIds = includeTagNamesArray
         .map(tagName => includeTagMap.get(tagName))
@@ -130,13 +130,15 @@ export const getTopTags = async (
   // 1. Sort by count descending
   // 2. Take the top 10, ensuring include tags are in the list
   let sortedTags = [...tagCounts.entries()].sort((a, b) => b[1] - a[1])
-  
+
   // Filter out include tags from the main results to avoid duplicates
-  const otherTags = sortedTags.filter(([tagId]) => !includeTagIds.includes(tagId))
-  
+  const otherTags = sortedTags.filter(
+    ([tagId]) => !includeTagIds.includes(tagId)
+  )
+
   // Get the top tags excluding those already in include tags
   const topOtherTags = otherTags.slice(0, 10)
-  
+
   // Prepare final tag IDs list - we'll first get all the tag details
   const tagIds = [...includeTagIds, ...topOtherTags.map(([id]) => id)]
 
@@ -178,7 +180,7 @@ export const getTopTags = async (
         isIncludeTag: true, // Mark as include tag for UI
       }
     })
-    .filter(Boolean);
+    .filter(Boolean)
 
   // Format the response for top tags
   const topTagsResponse = topOtherTags
@@ -197,7 +199,7 @@ export const getTopTags = async (
         isIncludeTag: false, // Not an include tag
       }
     })
-    .filter(Boolean);
+    .filter(Boolean)
 
   // Return both sets of tags
   return {

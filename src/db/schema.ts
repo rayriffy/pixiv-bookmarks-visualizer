@@ -1,12 +1,4 @@
-import {
-  int,
-  text,
-  sqliteTable,
-  blob,
-  real,
-  integer,
-  index,
-} from 'drizzle-orm/sqlite-core'
+import { int, text, sqliteTable, integer, index } from 'drizzle-orm/sqlite-core'
 import { relations } from 'drizzle-orm'
 
 export const illustsTable = sqliteTable(

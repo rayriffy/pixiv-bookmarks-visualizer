@@ -1,4 +1,4 @@
-import type { MinimumSizer } from '../../core/@types/MinimumSizer'
+import type { MinimumSizer } from '../@types/MinimumSizer'
 
 export const minimumSizer: MinimumSizer = {
   mode: 'none',

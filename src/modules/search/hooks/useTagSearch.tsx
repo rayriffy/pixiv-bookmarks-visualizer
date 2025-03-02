@@ -7,11 +7,11 @@ import type { ReactElement } from 'react'
 import { useSearchParams } from '../../../hooks/useSearchParams'
 
 export const useTagSearch = (
-  selectedTags: TagItem[], 
+  selectedTags: TagItem[],
   alreadySelectedTags?: TagItem[]
 ) => {
   const { includeTags, excludeTags } = useSearchParams()
-  
+
   return async (
     inputValue: string
   ): Promise<
@@ -22,8 +22,11 @@ export const useTagSearch = (
   > => {
     try {
       // If alreadySelectedTags wasn't provided, default to combining both include and exclude tags
-      const allSelectedTags = alreadySelectedTags || [...includeTags, ...excludeTags]
-      
+      const allSelectedTags = alreadySelectedTags || [
+        ...includeTags,
+        ...excludeTags,
+      ]
+
       const tagSearchPayload: TagSearchRequest = {
         query: inputValue,
         selectedTags: selectedTags.map(t => t.name), // Selected tags for the search context

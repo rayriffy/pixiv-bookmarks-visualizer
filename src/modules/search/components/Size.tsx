@@ -19,12 +19,12 @@ export const Size = () => {
   }
 
   const [input, setInput] = useState(minimumSizer.size.toString())
-  
+
   // Update input when minimumSizer changes (from URL params)
   useEffect(() => {
     setInput(minimumSizer.size.toString())
   }, [minimumSizer.size])
-  
+
   const setDebounceInput = debounce(value => {
     if (
       !Number.isNaN(Number(value)) &&

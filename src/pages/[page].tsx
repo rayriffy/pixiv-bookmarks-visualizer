@@ -14,7 +14,7 @@ import { SearchFilters } from '../modules/search/components/SearchFilters'
 import { TopTags } from '../modules/topTags/component/TopTags'
 import type { Tag } from '../core/@types/api/TagSearchResponse'
 
-const Page: NextPage = props => {
+const Page: NextPage = () => {
   const router = useRouter()
   const { query } = router
 
@@ -27,19 +27,12 @@ const Page: NextPage = props => {
     searchPayload,
   } = useSearchParams()
 
-  const pageNumber = useMemo(
-    () => (query.page === undefined ? 1 : Number(query.page as string)),
-    [query]
-  )
-
   const { data, error } = useSWR<SearchResult, any, string>(
     `/api/search?${buildURLParams(searchPayload())}`
   )
-  const { data: topTagsResponse, error: topTagsError } = useSWR<
-    { tags: Tag[] },
-    any,
-    string
-  >(`/api/topTags?${buildURLParams(searchPayload())}`)
+  const { data: topTagsResponse } = useSWR<{ tags: Tag[] }, any, string>(
+    `/api/topTags?${buildURLParams(searchPayload())}`
+  )
 
   // Update tag counts when top tags data changes
   useEffect(() => {
@@ -54,7 +47,13 @@ const Page: NextPage = props => {
         setExcludeTags(prev => updateTagCounts(prev, topTagsResponse.tags))
       }
     }
-  }, [topTagsResponse, setIncludeTags, setExcludeTags, includeTags.length, excludeTags.length])
+  }, [
+    topTagsResponse,
+    setIncludeTags,
+    setExcludeTags,
+    includeTags.length,
+    excludeTags.length,
+  ])
 
   return (
     <main className={'p-4'}>

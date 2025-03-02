@@ -25,7 +25,7 @@ export const TagSelector = ({
 }: TagSelectorProps) => {
   const [loading, setLoading] = useState(false)
   const isHandlingChange = useRef(false)
-  
+
   // Create the value object for react-select
   const selectValue = tags.map(tag => ({
     value: tag,
@@ -52,19 +52,17 @@ export const TagSelector = ({
   const handleChange = (val: any[]) => {
     // Avoid processing if we're already handling a change
     if (isHandlingChange.current) return
-    
+
     isHandlingChange.current = true
-    
+
     try {
       // Extract the tag values and ensure they're valid
-      const newTags = Array.isArray(val) 
-        ? val
-            .map(o => o.value as TagItem)
-            .filter(tag => tag && tag.name)
-        : [];
-      
+      const newTags = Array.isArray(val)
+        ? val.map(o => o.value as TagItem).filter(tag => tag && tag.name)
+        : []
+
       // Explicitly call with empty array if all tags were removed
-      onChange(newTags);
+      onChange(newTags)
     } finally {
       // Reset the flag after a delay to allow state to update
       setTimeout(() => {

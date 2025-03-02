@@ -1,4 +1,4 @@
-import { NextApiRequest, type NextApiResponse } from 'next'
+import type { NextApiResponse } from 'next'
 
 /**
  * Simple error handler for proxy routes

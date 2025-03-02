@@ -1,8 +1,8 @@
-import { type SQL, and, eq, inArray, or } from 'drizzle-orm'
+import { type SQL, and, eq, inArray } from 'drizzle-orm'
 import type { ProcessedTags } from './filterUtils'
 import { illustTagsTable, illustsTable, tagsTable } from '../../db/schema'
 import { getDbClient } from '../../db/connect'
-import { batchedQuery, SQLITE_PARAMS_LIMIT } from './dbUtils'
+import { batchedQuery } from './dbUtils'
 
 /**
  * Process tag filters and return the IDs of illustrations that match all included tags
@@ -153,7 +153,7 @@ export const processTagFilters = async (
 
       // IMPROVED APPROACH FOR EXCLUDE TAGS:
       // Instead of processing exclude tags in a single batch, process them one by one
-      const excludedIllustIds = new Set<number>();
+      const excludedIllustIds = new Set<number>()
 
       // Process one tag at a time to avoid hitting parameter limits
       for (const tagId of validTagIds) {
@@ -168,12 +168,12 @@ export const processTagFilters = async (
                 eq(illustTagsTable.tag_id, tagId),
                 inArray(illustTagsTable.illust_id, batchIllustIds)
               )
-            );
+            )
 
           // Add matching illusts to the exclusion set
-          results.forEach(r => excludedIllustIds.add(r.illust_id));
-          return results;
-        });
+          results.forEach(r => excludedIllustIds.add(r.illust_id))
+          return results
+        })
       }
 
       // Filter out excluded illusts

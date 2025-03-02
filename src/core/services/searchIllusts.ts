@@ -12,8 +12,6 @@ import {
   dbResultToPixivIllust,
   groupTagsByIllustId,
   mapUsersByIllustId,
-  batchedQuery,
-  SQLITE_PARAMS_LIMIT,
 } from './dbUtils'
 import type { SearchResult } from '../@types/api/SearchResult'
 import { createFiltersFromSearchRequest, processTagParams } from './filterUtils'
@@ -49,18 +47,18 @@ export async function searchIllusts(
   }
 
   // Get the total count first to support pagination
-  let total = 0;
-  
+  let total: number
+
   if (targetIllustIds === null) {
     // If no tag filters, just count with base filters
     const [countResult] = await db
       .select({ total: count() })
       .from(illustsTable)
-      .where(and(...filters));
-    total = countResult.total;
+      .where(and(...filters))
+    total = countResult.total
   } else {
     // If we have target illust IDs, count them directly
-    total = targetIllustIds.length;
+    total = targetIllustIds.length
   }
 
   // Early return if no results
@@ -69,7 +67,7 @@ export async function searchIllusts(
   }
 
   // Get the illusts for the current page
-  let illustIds: number[] = [];
+  let illustIds: number[]
 
   if (targetIllustIds === null) {
     // If no tag filters, get illusts with pagination
@@ -79,14 +77,14 @@ export async function searchIllusts(
       .where(and(...filters))
       .orderBy(desc(illustsTable.id))
       .limit(pageSize)
-      .offset(offset);
-    
-    illustIds = results.map(r => r.id);
+      .offset(offset)
+
+    illustIds = results.map(r => r.id)
   } else {
     // If we have target illust IDs from tag filtering, paginate them in memory
     // Sort in descending order (newest first)
-    const sortedIds = [...targetIllustIds].sort((a, b) => b - a);
-    illustIds = sortedIds.slice(offset, offset + pageSize);
+    const sortedIds = [...targetIllustIds].sort((a, b) => b - a)
+    illustIds = sortedIds.slice(offset, offset + pageSize)
   }
 
   if (illustIds.length === 0) {
@@ -98,7 +96,7 @@ export async function searchIllusts(
     .select({ illusts: illustsTable })
     .from(illustsTable)
     .where(inArray(illustsTable.id, illustIds))
-    .orderBy(desc(illustsTable.id));
+    .orderBy(desc(illustsTable.id))
 
   // Get user data and tag data in parallel
   const [userResults, tagResults] = await Promise.all([
@@ -121,13 +119,13 @@ export async function searchIllusts(
       .from(illustTagsTable)
       .innerJoin(tagsTable, eq(illustTagsTable.tag_id, tagsTable.id))
       .where(inArray(illustTagsTable.illust_id, illustIds)),
-  ]);
+  ])
 
   // Map users to illusts
-  const usersByIllustId = mapUsersByIllustId(userResults);
+  const usersByIllustId = mapUsersByIllustId(userResults)
 
   // Group tags by illust
-  const tagsByIllustId = groupTagsByIllustId(tagResults);
+  const tagsByIllustId = groupTagsByIllustId(tagResults)
 
   // Combine all the data into ExtendedPixivIllust format
   const illusts = illustResults.map(result => {
@@ -137,7 +135,7 @@ export async function searchIllusts(
       tags: tagsByIllustId.get(result.illusts.id) || [],
     }
     return dbResultToPixivIllust(combinedResult)
-  });
+  })
 
   // Construct the final result with pagination
   return {

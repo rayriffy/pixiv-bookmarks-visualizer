@@ -1,4 +1,4 @@
-import { memo, useContext, useEffect, useMemo } from 'react'
+import { memo } from 'react'
 
 import { useHover } from 'web-api-hooks'
 
@@ -42,8 +42,8 @@ export const Illust = memo<Props>(props => {
   const illustSize = illust.meta_pages.length
   const slicedImage = illust.meta_pages.slice(1, 3)
 
-  const isBlur = (illust.bookmark_private ||
-      illust.tags.some(tag => tag.name === 'R-18')) &&
+  const isBlur =
+    (illust.bookmark_private || illust.tags.some(tag => tag.name === 'R-18')) &&
     blur
 
   return (
