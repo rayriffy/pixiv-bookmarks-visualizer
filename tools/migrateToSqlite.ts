@@ -72,12 +72,14 @@ async function main() {
 
   // Insert users
   console.log(`Inserting ${uniqueUsers.size} users...`)
-  const usersToInsert: typeof usersTable.$inferInsert[] = Array.from(uniqueUsers.values())
+  const usersToInsert: (typeof usersTable.$inferInsert)[] = Array.from(
+    uniqueUsers.values()
+  )
   for (let i = 0; i < usersToInsert.length; i += 100) {
     const batch = usersToInsert.slice(i, i + 100)
-    await db.transaction(async (tx) => {
+    await db.transaction(async tx => {
       await tx.insert(usersTable).values(batch).onConflictDoNothing()
-    });
+    })
     console.log(
       `Inserted users batch ${i + 1} to ${Math.min(i + 100, usersToInsert.length)}`
     )
@@ -85,12 +87,14 @@ async function main() {
 
   // Insert tags
   console.log(`Inserting ${uniqueTags.size} tags...`)
-  const tagsToInsert: typeof tagsTable.$inferInsert[] = Array.from(uniqueTags.values())
+  const tagsToInsert: (typeof tagsTable.$inferInsert)[] = Array.from(
+    uniqueTags.values()
+  )
   for (let i = 0; i < tagsToInsert.length; i += 100) {
     const batch = tagsToInsert.slice(i, i + 100)
-    await db.transaction(async (tx) => {
+    await db.transaction(async tx => {
       await tx.insert(tagsTable).values(batch).onConflictDoNothing()
-    });
+    })
     console.log(
       `Inserted tags batch ${i + 1} to ${Math.min(i + 100, tagsToInsert.length)}`
     )
@@ -107,14 +111,14 @@ async function main() {
 
   for (let i = 0; i < illusts.length; i += 100) {
     const batch = illusts.slice(i, i + 100)
-    
+
     // Process batch in a transaction
-    await db.transaction(async (tx) => {
+    await db.transaction(async tx => {
       // Prepare all data for batch insertion
-      const illustsToInsert: typeof illustsTable.$inferInsert[] = [];
-      const userRelationsToInsert: typeof illustUsersTable.$inferInsert[] = [];
-      const tagRelationsToInsert: typeof illustTagsTable.$inferInsert[] = [];
-      
+      const illustsToInsert: (typeof illustsTable.$inferInsert)[] = []
+      const userRelationsToInsert: (typeof illustUsersTable.$inferInsert)[] = []
+      const tagRelationsToInsert: (typeof illustTagsTable.$inferInsert)[] = []
+
       for (const illust of batch) {
         // Prepare illustration data
         illustsToInsert.push({
@@ -143,40 +147,49 @@ async function main() {
           meta_pages: JSON.stringify(illust.meta_pages),
           tools: JSON.stringify(illust.tools),
           url: illust.url || null,
-        });
-        
+        })
+
         // Prepare user-illustration relation
         userRelationsToInsert.push({
           id: relationCounter++,
           illust_id: illust.id,
           user_id: illust.user.id,
-        });
-        
+        })
+
         // Prepare tag-illustration relations
         for (const tag of illust.tags) {
           tagRelationsToInsert.push({
             id: relationCounter++,
             illust_id: illust.id,
             tag_id: tagMap.get(tag.name)!,
-          });
+          })
         }
       }
-      
+
       // Insert all illustrations in a single query
       if (illustsToInsert.length > 0) {
-        await tx.insert(illustsTable).values(illustsToInsert).onConflictDoNothing();
+        await tx
+          .insert(illustsTable)
+          .values(illustsToInsert)
+          .onConflictDoNothing()
       }
-      
+
       // Insert all user relations in a single query
       if (userRelationsToInsert.length > 0) {
-        await tx.insert(illustUsersTable).values(userRelationsToInsert).onConflictDoNothing();
+        await tx
+          .insert(illustUsersTable)
+          .values(userRelationsToInsert)
+          .onConflictDoNothing()
       }
-      
+
       // Insert all tag relations in a single query
       if (tagRelationsToInsert.length > 0) {
-        await tx.insert(illustTagsTable).values(tagRelationsToInsert).onConflictDoNothing();
+        await tx
+          .insert(illustTagsTable)
+          .values(tagRelationsToInsert)
+          .onConflictDoNothing()
       }
-    });
+    })
 
     console.log(
       `Inserted illustrations batch ${i + 1} to ${Math.min(i + 100, illusts.length)}`
