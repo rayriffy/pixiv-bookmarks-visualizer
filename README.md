@@ -35,15 +35,15 @@ cp .env.example .env
 After that, install dependencies reqired for this project and run a script to obtain all of your bookmarks. Script will take a while to scrape data, depending on how much bookmarks in your account.
 
 ```
-pnpm i
-pnpm db:init
-pnpm build:data
+bun i
+bun db:init
+bun build:data
 ```
 
 Optionally, you can pre-download **all** illusts into local machine right away to reduce frist-load image time in browser. Each image will consume avarage of *40KB* of storage (minimum 10KB, maximum ~100KB). To do this run following command.
 
 ```
-node -r @swc-node/register ./tools/preloadImage.ts
+bun build:image
 ```
 
 Pixiv CDN may not prepared you to access very old illusts which could cause some preload image to fail. Just running preload command continuously until no any `fail: ` emit into output.
@@ -54,7 +54,7 @@ Notes for うごイラ illusts
 By default this web app will not try to display image as gifs since it take a lot of time to response back. If you want *うごイラ* illusts to be animated run following command to generated (somewhat) highly optimized animated WebP.
 
 ```
-node -r @swc-node/register ./tools/ugoira.ts
+bun build:ugoira
 ```
 
 Also, [`img2webp`](https://developers.google.com/speed/webp/docs/img2webp) is required. Install on your macOS by running `brew install webp`
@@ -71,14 +71,14 @@ There're 3 method to start a server, but I do prefer a thrid method
 ### Method 1: Start as development server
 
 ```
-pnpm dev
+bun dev
 ```
 
 ### Method 2: Start as production server (less pre-compile time)
 
 ```
-pnpm build
-pnpm start
+bun run build
+bun run start
 ```
 
 ### Method 3: Start as container service
