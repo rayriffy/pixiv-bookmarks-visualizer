@@ -6,8 +6,10 @@ services:
     volumes:
       - ./.next/cache:/app/.next/cache
     ports:
-      - 8081:3000
+      - 3541:3000
     restart: unless-stopped
+    env_file:
+      - .env
     build:
       context: ./
       dockerfile: Dockerfile

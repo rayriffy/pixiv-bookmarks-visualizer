@@ -13,6 +13,7 @@ const nextConfig: NextConfig = {
   experimental: {
     reactCompiler: true,
   },
+  serverExternalPackages: ["@libsql/client", "@libsql/linux-arm64-musl"],
   output: process.env.STANDALONE === 'true' ? 'standalone' : undefined,
 }
 
