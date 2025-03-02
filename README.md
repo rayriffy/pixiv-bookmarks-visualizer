@@ -17,7 +17,12 @@ Features
 Preload data
 ---
 
-> **Caution!** This project is only built for running locally, please do not deploy to public internet otherwise it might not working properly, or all of your private bookmarks will be public
+> [!NOTE]
+> Our backend engine are now using SQLite to store all of your bookmarks' data. This will reduce the time to load all of your bookmarks data into memory, and also reduce the time to search for specific illusts.
+> This may have performance degradation for HDD users.
+
+> [!WARNING]
+> This project is only built for running locally, please do not deploy to public internet otherwise it might not be working properly, or all of your private bookmarks will be public
 
 First, you have to get your account refresh token in any mean nessesary. I recommend [this script](https://github.com/eggplants/get-pixivpy-token) to obtain refresh token.
 
