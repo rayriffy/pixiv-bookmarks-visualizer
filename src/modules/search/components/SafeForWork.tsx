@@ -1,9 +1,20 @@
-import { useContext } from 'react'
-import { SearchBarContext } from '../../../context/SearchBarContext'
+import { useRef, useEffect } from 'react'
+import { useSearchParams } from '../../../hooks/useSearchParams'
 
 export const SafeForWork = () => {
-  const searchBarContext = useContext(SearchBarContext)
-  const [blur, setBlur] = searchBarContext.blur
+  const { blur, setBlur } = useSearchParams()
+  const isHandlingChange = useRef(false)
+  
+  // To prevent double-render issues with checkboxes
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    isHandlingChange.current = true
+    setBlur(e.target.checked)
+    
+    // Reset flag after a delay
+    setTimeout(() => {
+      isHandlingChange.current = false
+    }, 50)
+  }
 
   return (
     <>
@@ -12,9 +23,7 @@ export const SafeForWork = () => {
         <input
           type="checkbox"
           checked={blur}
-          onChange={e => {
-            setBlur(e.target.checked)
-          }}
+          onChange={handleChange}
           className="toggle"
         />
         SFW mode

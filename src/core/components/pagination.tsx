@@ -1,6 +1,7 @@
-import { memo } from 'react'
+import { memo, useEffect, useState } from 'react'
 
 import Link from 'next/link'
+import { useRouter } from 'next/router'
 import { classNames } from './classNames'
 
 interface Props {
@@ -10,6 +11,15 @@ interface Props {
 
 export const Pagination = memo<Props>(props => {
   const { max, current } = props
+  const router = useRouter()
+  const [searchParams, setSearchParams] = useState('')
+  
+  // Get current search parameters to preserve them when changing pages
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      setSearchParams(window.location.search)
+    }
+  }, [router.asPath])
 
   const pageLength: number = max > 5 ? 5 : max
   const startPoint: number =
@@ -24,18 +34,29 @@ export const Pagination = memo<Props>(props => {
   return (
     <div className="flex justify-center py-8">
       <div className="join">
-        {Array.from({ length: pageLength }, (_, i) => (
-          <Link
-            key={`pagination-${startPoint + i}`}
-            href={startPoint + i === 0 ? '/' : `/${startPoint + i + 1}`}
-            className={classNames(
-              'join-item btn',
-              current === startPoint + i + 1 ? 'btn-active' : ''
-            )}
-          >
-            {startPoint + i + 1}
-          </Link>
-        ))}
+        {Array.from({ length: pageLength }, (_, i) => {
+          const pageNum = startPoint + i + 1
+          const path = pageNum === 1 ? '/' : `/${pageNum}`
+          
+          // Preserve search params when changing page
+          const href = {
+            pathname: path,
+            search: searchParams,
+          }
+          
+          return (
+            <Link
+              key={`pagination-${startPoint + i}`}
+              href={href}
+              className={classNames(
+                'join-item btn',
+                current === pageNum ? 'btn-active' : ''
+              )}
+            >
+              {pageNum}
+            </Link>
+          )
+        })}
       </div>
     </div>
   )

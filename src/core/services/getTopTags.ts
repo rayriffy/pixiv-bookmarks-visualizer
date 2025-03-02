@@ -62,7 +62,7 @@ export const getTopTags = async (
       .from(illustTagsTable)
       .where(inArray(illustTagsTable.illust_id, illustIds))
       .groupBy(illustTagsTable.tag_id)
-      .orderBy(sql`count(illust_id) DESC`) // Explicit count column reference
+      .orderBy(sql`count(${illustTagsTable.illust_id}) DESC`) // Fix the SQL syntax
   }
 
   // Process using batched query utility for better efficiency
@@ -81,21 +81,72 @@ export const getTopTags = async (
     tagCounts.set(result.tag_id, currentCount + Number(result.count))
   }
 
+  // If we have include tags, prepare to make sure they are included in results
+  const includeTagNames = searchRequest.includeTags || []
+  const includeTagNameSet = new Set(
+    Array.isArray(includeTagNames) ? includeTagNames : [includeTagNames]
+  )
+  let includeTagIds: number[] = []
+
+  // Get tag ids for include tags if any exist
+  if (includeTagNameSet.size > 0) {
+    // Convert set back to array for the query
+    const includeTagNamesArray = Array.from(includeTagNameSet)
+    
+    // Only query if we have tags to look up
+    if (includeTagNamesArray.length > 0) {
+      const includeTags = await db
+        .select({
+          id: tagsTable.id,
+          name: tagsTable.name
+        })
+        .from(tagsTable)
+        .where(inArray(tagsTable.name, includeTagNamesArray))
+
+      // Map of tag name to id
+      const includeTagMap = new Map(includeTags.map(tag => [tag.name, tag.id]))
+      
+      // Build list of include tag IDs
+      includeTagIds = includeTagNamesArray
+        .map(tagName => includeTagMap.get(tagName))
+        .filter(Boolean) as number[]
+
+      // Ensure these appear in our tag counts
+      includeTagIds.forEach(tagId => {
+        if (!tagCounts.has(tagId)) {
+          // If tag isn't in results but is an include tag, add it with count 0
+          tagCounts.set(tagId, 0)
+        }
+      })
+    }
+  }
+
   // Short-circuit if no tags found
   if (tagCounts.size === 0) {
     return { tags: [] }
   }
 
-  // Convert to array for sorting and get top 10
-  const sortedTags = [...tagCounts.entries()]
-    .sort((a, b) => b[1] - a[1])
-    .slice(0, 10)
+  // Convert to array for sorting and get top tags
+  // 1. Sort by count descending
+  // 2. Take the top 10, ensuring include tags are in the list
+  let sortedTags = [...tagCounts.entries()].sort((a, b) => b[1] - a[1])
+  
+  // Filter out include tags from the main results to avoid duplicates
+  const otherTags = sortedTags.filter(([tagId]) => !includeTagIds.includes(tagId))
+  
+  // Get the top tags excluding those already in include tags
+  const topOtherTags = otherTags.slice(0, 10)
+  
+  // Prepare final tag IDs list - we'll first get all the tag details
+  const tagIds = [...includeTagIds, ...topOtherTags.map(([id]) => id)]
 
-  // Get tag details using the id index
-  const tagIds = sortedTags.map(([id]) => id)
+  // If no tag IDs to look up, return empty result
+  if (tagIds.length === 0) {
+    return { tags: [] }
+  }
 
-  // Get tag info for these top tags - using batchedQuery for safety with large datasets
-  const topTags = await batchedQuery(tagIds, async batchIds => {
+  // Get tag info for all these tags - using batchedQuery for safety
+  const allTagDetails = await batchedQuery(tagIds, async batchIds => {
     return db
       .select({
         id: tagsTable.id,
@@ -107,25 +158,49 @@ export const getTopTags = async (
   })
 
   // Create a map for faster lookups
-  const tagDetailsMap = new Map(topTags.map(tag => [tag.id, tag]))
+  const tagDetailsMap = new Map(allTagDetails.map(tag => [tag.id, tag]))
 
-  // Format the response with faster map lookups
+  // Format the response for include tags first, then top tags
+  // We'll skip include tags in the top tags section to avoid duplicates
+  const includeTagsResponse = includeTagIds
+    .map(tagId => {
+      const tag = tagDetailsMap.get(tagId)
+      const count = tagCounts.get(tagId) || 0
+
+      if (!tag) return null
+
+      return {
+        name: {
+          original: tag.name,
+          translated: tag.translated_name || null,
+        },
+        count,
+        isIncludeTag: true, // Mark as include tag for UI
+      }
+    })
+    .filter(Boolean);
+
+  // Format the response for top tags
+  const topTagsResponse = topOtherTags
+    .map(([tagId]) => {
+      const tag = tagDetailsMap.get(tagId)
+      const count = tagCounts.get(tagId) || 0
+
+      if (!tag) return null
+
+      return {
+        name: {
+          original: tag.name,
+          translated: tag.translated_name || null,
+        },
+        count,
+        isIncludeTag: false, // Not an include tag
+      }
+    })
+    .filter(Boolean);
+
+  // Return both sets of tags
   return {
-    tags: tagIds
-      .map(tagId => {
-        const tag = tagDetailsMap.get(tagId)
-        const count = tagCounts.get(tagId) || 0
-
-        if (!tag) return null // Handle missing tags
-
-        return {
-          name: {
-            original: tag.name,
-            translated: tag.translated_name || null,
-          },
-          count,
-        }
-      })
-      .filter(Boolean) as any[], // Filter out any nulls (missing tags)
+    tags: [...includeTagsResponse, ...topTagsResponse] as any[],
   }
 }

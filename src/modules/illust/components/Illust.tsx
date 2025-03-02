@@ -5,8 +5,8 @@ import { useHover } from 'web-api-hooks'
 import { RectangleStackIcon } from '@heroicons/react/24/solid'
 import type { ExtendedPixivIllust } from '../../../core/@types/ExtendedPixivIllust'
 import { getOptimizedIllustUrl } from '../services/getOptimizedIllustUrl'
-import { SearchBarContext } from '../../../context/SearchBarContext'
 import { classNames } from '../../../core/components/classNames'
+import { useSearchParams } from '../../../hooks/useSearchParams'
 
 interface Props {
   illust: ExtendedPixivIllust
@@ -30,24 +30,21 @@ const FrontImage = memo<Props>(props => {
       decoding="async"
       className="rounded-lg shadow z-20"
       {...bindHover}
+      alt={illust.caption}
     />
   )
 })
 
 export const Illust = memo<Props>(props => {
   const { illust } = props
+  const { blur } = useSearchParams()
 
-  const illustSize = useMemo(() => illust.meta_pages.length, [])
-  const slicedImage = useMemo(() => illust.meta_pages.slice(1, 3), [])
+  const illustSize = illust.meta_pages.length
+  const slicedImage = illust.meta_pages.slice(1, 3)
 
-  const searchBarContext = useContext(SearchBarContext)
-  const isBlur = useMemo(
-    () =>
-      (illust.bookmark_private ||
-        illust.tags.some(tag => tag.name === 'R-18')) &&
-      searchBarContext.blur[0],
-    [searchBarContext.blur[0]]
-  )
+  const isBlur = (illust.bookmark_private ||
+      illust.tags.some(tag => tag.name === 'R-18')) &&
+    blur
 
   return (
     <div className="mx-auto relative overflow-hidden">
@@ -75,6 +72,7 @@ export const Illust = memo<Props>(props => {
           <FrontImage {...props} />
         ) : (
           <img
+            alt={illust.caption}
             src={getOptimizedIllustUrl(
               illust.id,
               illust.type,
@@ -89,6 +87,7 @@ export const Illust = memo<Props>(props => {
         )}
         {slicedImage.map((image, i) => (
           <img
+            alt={illust.caption}
             key={`sub-illust${illust.id}-${i}`}
             src={getOptimizedIllustUrl(illust.id, '', image.image_urls.medium)}
             width={illust.width}

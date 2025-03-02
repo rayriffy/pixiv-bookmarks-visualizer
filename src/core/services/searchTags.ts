@@ -1,4 +1,4 @@
-import { SQL, and, count, eq, inArray, ilike, like, or, sql } from 'drizzle-orm'
+import { SQL, and, count, eq, inArray, ilike, like, not, or, sql } from 'drizzle-orm'
 import type { TagSearchRequest } from '../@types/api/TagSearchRequest'
 import type { Tag, TagSearchResponse } from '../@types/api/TagSearchResponse'
 import { getDbClient } from '../../db/connect'
@@ -17,11 +17,18 @@ export async function searchTags(
   const db = getDbClient()
   const query = request.query || ''
 
-  // Normalize selected tags
+  // Normalize selected tags and excluded tags
   const selectedTags = Array.isArray(request.selectedTags)
     ? request.selectedTags
     : typeof request.selectedTags === 'string'
       ? [request.selectedTags]
+      : []
+      
+  // Get already selected tags (to exclude them from results)
+  const alreadySelectedTags = Array.isArray(request.alreadySelectedTags)
+    ? request.alreadySelectedTags
+    : typeof request.alreadySelectedTags === 'string'
+      ? [request.alreadySelectedTags]
       : []
 
   // If we have selected tags, first get all illusts that have these tags
@@ -106,7 +113,8 @@ export async function searchTags(
   // Helper to get tag details by IDs with optimized batching
   async function getTagDetails(tagIds: number[]): Promise<any[]> {
     return batchedQuery(tagIds, async batchIds => {
-      const tagQuery = db
+      // Build initial query
+      let tagQuery = db
         .select({
           id: tagsTable.id,
           name: tagsTable.name,
@@ -114,27 +122,34 @@ export async function searchTags(
         })
         .from(tagsTable)
         .where(inArray(tagsTable.id, batchIds))
-
-      // Apply text search if needed, utilizing indexes
+      
+      // Apply text search if needed
+      const whereConditions: SQL[] = [inArray(tagsTable.id, batchIds)]
+      
       if (query) {
         const lowerQuery = `%${query.toLowerCase()}%`
-        const whereClause = or(
+        const searchClause = or(
           sql`lower(${tagsTable.name}) like ${lowerQuery}`,
           sql`lower(${tagsTable.translated_name}) like ${lowerQuery}`
         )
-
-        // Need to rebuild the query with the additional where clause
-        return db
-          .select({
-            id: tagsTable.id,
-            name: tagsTable.name,
-            translated_name: tagsTable.translated_name,
-          })
-          .from(tagsTable)
-          .where(and(inArray(tagsTable.id, batchIds), whereClause))
+        whereConditions.push(searchClause)
       }
-
-      return tagQuery.execute()
+      
+      // Exclude already selected tags
+      if (alreadySelectedTags.length > 0) {
+        const excludeClause = not(inArray(tagsTable.name, alreadySelectedTags))
+        whereConditions.push(excludeClause)
+      }
+      
+      // Build final query with all conditions
+      return db
+        .select({
+          id: tagsTable.id,
+          name: tagsTable.name,
+          translated_name: tagsTable.translated_name,
+        })
+        .from(tagsTable)
+        .where(and(...whereConditions))
     })
   }
 
@@ -180,6 +195,11 @@ export async function searchTags(
   const uniqueTags = new Map<string, Tag>()
 
   tagDetails.forEach(tag => {
+    // Skip tags that are already selected (double check)
+    if (alreadySelectedTags.includes(tag.name)) {
+      return
+    }
+    
     // Only add if this tag name isn't already in our map, or if it has a higher count
     if (
       !uniqueTags.has(tag.name) ||

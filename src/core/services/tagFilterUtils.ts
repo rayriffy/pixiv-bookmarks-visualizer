@@ -1,8 +1,8 @@
-import { type SQL, and, eq, inArray } from 'drizzle-orm'
+import { type SQL, and, eq, inArray, or } from 'drizzle-orm'
 import type { ProcessedTags } from './filterUtils'
 import { illustTagsTable, illustsTable, tagsTable } from '../../db/schema'
 import { getDbClient } from '../../db/connect'
-import { batchedQuery } from './dbUtils'
+import { batchedQuery, SQLITE_PARAMS_LIMIT } from './dbUtils'
 
 /**
  * Process tag filters and return the IDs of illustrations that match all included tags
@@ -151,29 +151,30 @@ export const processTagFilters = async (
         return []
       }
 
-      // Get all illust IDs that have any of the excluded tags
-      // Using a Set for faster lookups and to avoid duplicates
-      const excludedIllustIds = new Set<number>()
+      // IMPROVED APPROACH FOR EXCLUDE TAGS:
+      // Instead of processing exclude tags in a single batch, process them one by one
+      const excludedIllustIds = new Set<number>();
 
-      // Process each tag ID to find matching illusts
-      await Promise.all(
-        validTagIds.map(async tagId => {
-          const results = await batchedQuery(baseIllustIds, async batchIds => {
-            return db
-              .select({ illust_id: illustTagsTable.illust_id })
-              .from(illustTagsTable)
-              .where(
-                and(
-                  eq(illustTagsTable.tag_id, tagId),
-                  inArray(illustTagsTable.illust_id, batchIds)
-                )
+      // Process one tag at a time to avoid hitting parameter limits
+      for (const tagId of validTagIds) {
+        // For each tag ID, process base illusts in manageable chunks using batchedQuery
+        await batchedQuery(baseIllustIds, async batchIllustIds => {
+          // Find all illusts with the current exclude tag
+          const results = await db
+            .select({ illust_id: illustTagsTable.illust_id })
+            .from(illustTagsTable)
+            .where(
+              and(
+                eq(illustTagsTable.tag_id, tagId),
+                inArray(illustTagsTable.illust_id, batchIllustIds)
               )
-          })
+            );
 
-          // Add all matching illusts to our exclusion set
-          results.forEach(r => excludedIllustIds.add(r.illust_id))
-        })
-      )
+          // Add matching illusts to the exclusion set
+          results.forEach(r => excludedIllustIds.add(r.illust_id));
+          return results;
+        });
+      }
 
       // Filter out excluded illusts
       targetIllustIds = baseIllustIds.filter(id => !excludedIllustIds.has(id))

@@ -4,6 +4,7 @@ export interface Tag {
     translated: string | null
   }
   count: number
+  isIncludeTag?: boolean
 }
 
 export interface TagSearchResponse {

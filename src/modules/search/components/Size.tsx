@@ -1,25 +1,30 @@
 import {
   type ChangeEventHandler,
   useCallback,
-  useContext,
+  useEffect,
   useState,
 } from 'react'
 import debounce from 'lodash/debounce'
-import { SearchBarContext } from '../../../context/SearchBarContext'
+import { useSearchParams } from '../../../hooks/useSearchParams'
 import { classNames } from '../../../core/components/classNames'
 
 export const Size = () => {
-  const searchBarContext = useContext(SearchBarContext)
-  const [minimumSizer, setMinimumSizer] = searchBarContext.minimumSizer
+  const { minimumSizer, setMinimumSizer } = useSearchParams()
 
   const toggleMode = (action: 'width' | 'height') => () => {
     setMinimumSizer(prev => ({
       ...prev,
-      mode: minimumSizer.mode === action ? 'none' : action,
+      mode: prev.mode === action ? 'none' : action,
     }))
   }
 
   const [input, setInput] = useState(minimumSizer.size.toString())
+  
+  // Update input when minimumSizer changes (from URL params)
+  useEffect(() => {
+    setInput(minimumSizer.size.toString())
+  }, [minimumSizer.size])
+  
   const setDebounceInput = debounce(value => {
     if (
       !Number.isNaN(Number(value)) &&
@@ -38,7 +43,7 @@ export const Size = () => {
       setInput(value)
       setDebounceInput(value)
     },
-    []
+    [setDebounceInput]
   )
 
   return (

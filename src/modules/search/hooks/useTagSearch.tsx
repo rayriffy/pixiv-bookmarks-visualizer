@@ -1,11 +1,17 @@
-import type { TagItem } from '../../../context/SearchBarContext'
+import type { TagItem } from '../../../hooks/useSearchParams'
 import type { TagSearchRequest } from '../../../core/@types/api/TagSearchRequest'
 import type { TagSearchResponse } from '../../../core/@types/api/TagSearchResponse'
 import { buildURLParams } from '../../../core/services/buildURLParams'
 import { TagSearchItem } from '../components/TagSearchItem'
 import type { ReactElement } from 'react'
+import { useSearchParams } from '../../../hooks/useSearchParams'
 
-export const useTagSearch = (selectedTags: TagItem[]) => {
+export const useTagSearch = (
+  selectedTags: TagItem[], 
+  alreadySelectedTags?: TagItem[]
+) => {
+  const { includeTags, excludeTags } = useSearchParams()
+  
   return async (
     inputValue: string
   ): Promise<
@@ -15,9 +21,13 @@ export const useTagSearch = (selectedTags: TagItem[]) => {
     }[]
   > => {
     try {
+      // If alreadySelectedTags wasn't provided, default to combining both include and exclude tags
+      const allSelectedTags = alreadySelectedTags || [...includeTags, ...excludeTags]
+      
       const tagSearchPayload: TagSearchRequest = {
         query: inputValue,
-        selectedTags: selectedTags.map(t => t.name), // Use just the names for the API
+        selectedTags: selectedTags.map(t => t.name), // Selected tags for the search context
+        alreadySelectedTags: allSelectedTags.map(t => t.name), // Tags to exclude from results
       }
 
       const expectedResults: TagSearchResponse = await fetch(

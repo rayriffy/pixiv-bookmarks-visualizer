@@ -1,15 +1,13 @@
 import type { Tag } from '../../../core/@types/api/TagSearchResponse'
-import { memo, useContext, useMemo } from 'react'
-import { SearchBarContext, TagItem } from '../../../context/SearchBarContext'
+import { memo, useMemo } from 'react'
+import { useSearchParams } from '../../../hooks/useSearchParams'
 
 interface Props {
   tags: Tag[]
 }
 
 export const TopTags = memo<Props>(({ tags }) => {
-  const searchBarContext = useContext(SearchBarContext)
-  const [includeTags, setIncludeTags] = searchBarContext.includeTags
-  const [excludeTags] = searchBarContext.excludeTags
+  const { includeTags, excludeTags, setIncludeTags } = useSearchParams()
 
   // Add a tag to the search filter with complete information
   const addTagToSearch = (tag: Tag) => {
@@ -17,7 +15,7 @@ export const TopTags = memo<Props>(({ tags }) => {
     const nameExists = includeTags.some(t => t.name === tag.name.original)
 
     if (!nameExists) {
-      // Add complete tag information
+      // Add complete tag information with the actual count from the tag
       setIncludeTags(prev => [
         ...prev,
         {
@@ -57,15 +55,13 @@ export const TopTags = memo<Props>(({ tags }) => {
           filteredTags.map(tag => (
             <p
               key={`tag-${tag.name.original}`}
-              className={
-                'bg-base-300 px-2 py-1 cursor-pointer hover:bg-base-200 transition-colors'
-              }
+              className="bg-base-300 px-2 py-1 cursor-pointer hover:bg-base-200 transition-colors"
               onClick={() => addTagToSearch(tag)}
               title="Click to add to search filters"
             >
-              <span className={'text-base-content'}>{tag.name.original}</span>
+              <span className="text-base-content">{tag.name.original}</span>
               {tag.name.translated && (
-                <span className={'px-1 text-base-content/60'}>
+                <span className="px-1 text-base-content/60">
                   {tag.name.translated}
                 </span>
               )}

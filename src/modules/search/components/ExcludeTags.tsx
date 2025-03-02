@@ -1,21 +1,41 @@
-import { useContext } from 'react'
-import { SearchBarContext } from '../../../context/SearchBarContext'
-import { TagSelector } from './TagSelector'
 import { useTagSearch } from '../hooks/useTagSearch'
+import { useSearchParams } from '../../../hooks/useSearchParams'
+import { useRef } from 'react'
+import dynamic from 'next/dynamic'
+
+const TagSelector = dynamic(() => import('./TagSelector').then(o => o.TagSelector))
 
 export const ExcludeTags = () => {
-  const searchBarContext = useContext(SearchBarContext)
-  const [tags, setTags] = searchBarContext.excludeTags
+  const { includeTags, excludeTags, setExcludeTags } = useSearchParams()
+  const isUpdating = useRef(false)
 
-  // Use the custom hook for tag search
-  const loadOptions = useTagSearch(tags)
+  // Use the custom hook for tag search, passing both include and exclude tags
+  // so we don't suggest tags that are already selected in either category
+  const loadOptions = useTagSearch(excludeTags, [...includeTags, ...excludeTags])
+
+  // Wrapper for setExcludeTags to ensure clean updates
+  const handleTagsChange = (newTags: any[]) => {
+    if (isUpdating.current) return
+    
+    isUpdating.current = true
+    
+    try {
+      // Ensure we're calling with a properly defined array, even if empty
+      setExcludeTags(newTags || []);
+    } finally {
+      // Reset after a delay
+      setTimeout(() => {
+        isUpdating.current = false
+      }, 100)
+    }
+  }
 
   return (
     <TagSelector
       label="Exclude tags"
-      tags={tags}
+      tags={excludeTags}
       loadOptions={loadOptions}
-      onChange={setTags}
+      onChange={handleTagsChange}
     />
   )
 }

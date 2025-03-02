@@ -1,88 +1,45 @@
 import type { NextPage } from 'next'
 import { useRouter } from 'next/router'
 
-import { useMemo, useContext, useEffect } from 'react'
+import { useMemo, useEffect } from 'react'
 import useSWR from 'swr'
 
 import { buildURLParams } from '../core/services/buildURLParams'
-import {
-  SearchBarContext,
-  TagItem,
-  updateTagCounts,
-} from '../context/SearchBarContext'
+import { useSearchParams, updateTagCounts } from '../hooks/useSearchParams'
 import { Pagination } from '../core/components/pagination'
 import { Illust } from '../modules/illust/components/Illust'
 
-import type { SearchRequest } from '../core/@types/api/SearchRequest'
 import type { SearchResult } from '../core/@types/api/SearchResult'
 import { SearchFilters } from '../modules/search/components/SearchFilters'
 import { TopTags } from '../modules/topTags/component/TopTags'
 import type { Tag } from '../core/@types/api/TagSearchResponse'
 
 const Page: NextPage = props => {
-  const { query } = useRouter()
+  const router = useRouter()
+  const { query } = router
 
-  // Context
-  const searchBarContext = useContext(SearchBarContext)
-  const [includeTags, setIncludeTags] = searchBarContext.includeTags
-  const [excludeTags, setExcludeTags] = searchBarContext.excludeTags
-  const [restrict] = searchBarContext.restriction
-  const [aspect] = searchBarContext.aspect
-  const [minimumSizer] = searchBarContext.minimumSizer
-  const [aiMode] = searchBarContext.aiMode
-  const [minimumPageCount] = searchBarContext.minimumPageCount
-  const [maximumPageCount] = searchBarContext.maximumPageCount
+  // Use our new hook instead of context
+  const {
+    includeTags,
+    setIncludeTags,
+    excludeTags,
+    setExcludeTags,
+    searchPayload,
+  } = useSearchParams()
 
   const pageNumber = useMemo(
     () => (query.page === undefined ? 1 : Number(query.page as string)),
     [query]
   )
 
-  // Extract just the tag names for the API request
-  const includeTagNames = useMemo(
-    () => includeTags.map(tag => tag.name),
-    [includeTags]
-  )
-  const excludeTagNames = useMemo(
-    () => excludeTags.map(tag => tag.name),
-    [excludeTags]
-  )
-
-  const searchPayload = useMemo<SearchRequest>(
-    () => ({
-      page: pageNumber.toString(),
-      includeTags: includeTagNames,
-      excludeTags: excludeTagNames,
-      restrict,
-      aspect,
-      sizerMode: minimumSizer.mode,
-      sizerSize: minimumSizer.size.toString(),
-      aiMode: aiMode,
-      minimumPageCount: minimumPageCount,
-      maximumPageCount: maximumPageCount,
-    }),
-    [
-      pageNumber,
-      includeTagNames,
-      excludeTagNames,
-      restrict,
-      aspect,
-      minimumSizer.mode,
-      minimumSizer.size,
-      aiMode,
-      minimumPageCount,
-      maximumPageCount,
-    ]
-  )
-
   const { data, error } = useSWR<SearchResult, any, string>(
-    `/api/search?${buildURLParams(searchPayload)}`
+    `/api/search?${buildURLParams(searchPayload())}`
   )
   const { data: topTagsResponse, error: topTagsError } = useSWR<
     { tags: Tag[] },
     any,
     string
-  >(`/api/topTags?${buildURLParams(searchPayload)}`)
+  >(`/api/topTags?${buildURLParams(searchPayload())}`)
 
   // Update tag counts when top tags data changes
   useEffect(() => {
@@ -97,7 +54,7 @@ const Page: NextPage = props => {
         setExcludeTags(prev => updateTagCounts(prev, topTagsResponse.tags))
       }
     }
-  }, [topTagsResponse, setIncludeTags, setExcludeTags])
+  }, [topTagsResponse, setIncludeTags, setExcludeTags, includeTags.length, excludeTags.length])
 
   return (
     <main className={'p-4'}>
