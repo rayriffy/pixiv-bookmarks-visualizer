@@ -19,7 +19,7 @@ export function updateTagCounts(
     }
 
     // Update existing tags with new counts if available
-    const result = existingTags.map((tag) => {
+    return existingTags.map((tag) => {
         // Match tag by name - tag.name should match original name from topTags
         const updatedInfo = tagCountMap.get(tag.name);
         if (updatedInfo) {
@@ -33,6 +33,4 @@ export function updateTagCounts(
         }
         return tag;
     });
-
-    return result;
 }

@@ -1,6 +1,6 @@
+import { useSearchParams } from "$searchFilters/useSearchParams";
 import type { Tag } from "$types/Tag";
 import { memo, useMemo } from "react";
-import { useSearchParams } from "../searchFilters/useSearchParams";
 
 interface Props {
     tags: Tag[];

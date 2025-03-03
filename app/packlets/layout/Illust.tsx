@@ -2,10 +2,10 @@ import { memo } from "react";
 
 import { useHover } from "web-api-hooks";
 
+import { useSearchParams } from "$searchFilters/useSearchParams";
 import type { ExtendedPixivIllust } from "$types/ExtendedPixivIllust";
 import { RectangleStackIcon } from "@heroicons/react/24/solid";
 import { clsx } from "clsx";
-import { useSearchParams } from "../searchFilters/useSearchParams";
 import { getOptimizedIllustUrl } from "./getOptimizedIllustUrl";
 
 interface Props {
