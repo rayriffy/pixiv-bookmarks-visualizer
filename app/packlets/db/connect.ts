@@ -14,6 +14,8 @@ export const getDbClient = mem(
             throw new Error("DB_FILE_NAME environment variable is not set");
         }
 
+        console.log(url, process.cwd())
+
         const sqlite = new Database(url);
         return drizzle({ client: sqlite, schema });
     },

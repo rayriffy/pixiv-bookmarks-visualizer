@@ -4,12 +4,10 @@ services:
   pixiv:
     container_name: "pixiv-bookmarks-visualizer"
     volumes:
-      - ./.next/cache:/app/.next/cache
+      - ./.data:/app/.data
     ports:
       - 3541:3000
     restart: unless-stopped
-    env_file:
-      - .env
     build:
       context: ./
       dockerfile: Dockerfile

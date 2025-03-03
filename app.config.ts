@@ -4,11 +4,6 @@ import tsConfigPaths from "vite-tsconfig-paths";
 
 export default defineConfig({
     vite: {
-        resolve: {
-            alias: {
-                "react-windowed-select": "react-windowed-select/dist/main.js",
-            },
-        },
         plugins: [
             tailwind(),
             tsConfigPaths({
@@ -18,5 +13,6 @@ export default defineConfig({
     },
     server: {
         preset: "bun",
+        serveStatic: "node"
     },
 });
