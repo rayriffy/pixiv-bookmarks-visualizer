@@ -8,6 +8,7 @@
         "build": "bun run --bun vinxi build",
         "start": "bun run --bun vinxi start",
         "lint": "biome check",
+        "type-check": "bun run --bun tsc",
         "build:data": "bun ./tools/fetcher.ts",
         "build:image": "bun ./tools/preloadImage.ts",
         "build:ugoira": "bun ./tools/ugoira.ts",
