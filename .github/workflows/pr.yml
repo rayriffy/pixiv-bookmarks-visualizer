@@ -19,7 +19,7 @@ jobs:
       - name: install
         run: bun i
       - name: biome
-        run: bun ci
+        run: bun biome ci
 
   build:
     name: Build
