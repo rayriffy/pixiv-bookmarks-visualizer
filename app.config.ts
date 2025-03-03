@@ -13,6 +13,6 @@ export default defineConfig({
     },
     server: {
         preset: "bun",
-        serveStatic: "node"
+        serveStatic: "node",
     },
 });
