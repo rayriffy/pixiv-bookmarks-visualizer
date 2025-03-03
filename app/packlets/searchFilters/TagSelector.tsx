@@ -1,5 +1,4 @@
 import type { TagItem } from "$types/TagItem";
-// import { WindowedMenuList } from "react-windowed-select";
 import { useEffect, useRef, useState } from "react";
 import type { ReactElement } from "react";
 import Async from "react-select/async";
@@ -90,9 +89,6 @@ export const TagSelector = ({ label, tags, loadOptions, onChange }: TagSelectorP
                 isLoading={loading}
                 onChange={handleChange}
                 isClearable={true}
-                // components={{
-                //     MenuList: WindowedMenuList,
-                // }}
                 styles={{
                     menu: (provided) => ({
                         ...provided,
