@@ -1,8 +1,8 @@
-import type { TagSearchRequest } from "$types/TagSearchRequest";
-import { searchTags } from "$api/searchTags";
 import { parseQuery, withErrorHandling } from "$api/apiUtils";
-import { createAPIFileRoute } from "@tanstack/react-start/api";
+import { searchTags } from "$api/searchTags";
+import type { TagSearchRequest } from "$types/TagSearchRequest";
 import { json } from "@tanstack/react-start";
+import { createAPIFileRoute } from "@tanstack/react-start/api";
 
 export const APIRoute = createAPIFileRoute("/api/tagSearch")({
     GET: withErrorHandling(async ({ request }) => {

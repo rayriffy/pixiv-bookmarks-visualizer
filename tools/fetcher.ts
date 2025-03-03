@@ -1,11 +1,11 @@
-import Pixiv, { type PixivMultiCall } from "pixiv.ts";
+import { Database } from "bun:sqlite";
 import dotenv from "dotenv";
 import { eq } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/bun-sqlite";
-import { Database } from "bun:sqlite";
+import Pixiv, { type PixivMultiCall } from "pixiv.ts";
 
+import { illustTagsTable, illustUsersTable, illustsTable, tagsTable, usersTable } from "$db/schema";
 import type { ExtendedPixivIllust } from "$types/ExtendedPixivIllust";
-import { illustsTable, illustTagsTable, illustUsersTable, tagsTable, usersTable } from "$db/schema";
 
 dotenv.config();
 const { PIXIV_USER_ID, PIXIV_REFRESH_TOKEN, DB_FILE_NAME } = process.env;

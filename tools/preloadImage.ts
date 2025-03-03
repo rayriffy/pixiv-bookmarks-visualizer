@@ -1,11 +1,11 @@
-import path from "node:path";
-import PQueue from "p-queue";
-import { drizzle } from "drizzle-orm/bun-sqlite";
 import { Database } from "bun:sqlite";
+import path from "node:path";
 import dotenv from "dotenv";
+import { drizzle } from "drizzle-orm/bun-sqlite";
+import PQueue from "p-queue";
 
-import { illustsTable } from "$db/schema";
 import { getPixivImageAndCache } from "$api/getPixivImageAndCache";
+import { illustsTable } from "$db/schema";
 
 dotenv.config();
 const { DB_FILE_NAME } = process.env;

@@ -1,15 +1,15 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { SearchFilters } from "$searchFilters/SearchFilters";
-import { TopTags } from "$topTags/TopTags";
-import { useSearchParams } from "$searchFilters/useSearchParams";
-import useSWR from "swr";
-import type { Tag } from "$types/Tag";
-import { buildURLParams } from "$searchFilters/buildURLParams";
-import type { SearchResult } from "$types/SearchResult";
-import { useEffect } from "react";
-import { updateTagCounts } from "$navigate/updateTagCounts";
-import { Pagination } from "$layout/Pagination";
 import { Illust } from "$layout/Illust";
+import { Pagination } from "$layout/Pagination";
+import { updateTagCounts } from "$navigate/updateTagCounts";
+import { SearchFilters } from "$searchFilters/SearchFilters";
+import { buildURLParams } from "$searchFilters/buildURLParams";
+import { useSearchParams } from "$searchFilters/useSearchParams";
+import { TopTags } from "$topTags/TopTags";
+import type { SearchResult } from "$types/SearchResult";
+import type { Tag } from "$types/Tag";
+import { createFileRoute } from "@tanstack/react-router";
+import { useEffect } from "react";
+import useSWR from "swr";
 
 export const Route = createFileRoute("/")({
     component: Home,

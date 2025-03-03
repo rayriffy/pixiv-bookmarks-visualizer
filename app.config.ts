@@ -1,6 +1,6 @@
+import tailwind from "@tailwindcss/vite";
 import { defineConfig } from "@tanstack/react-start/config";
 import tsConfigPaths from "vite-tsconfig-paths";
-import tailwind from "@tailwindcss/vite";
 
 export default defineConfig({
     vite: {

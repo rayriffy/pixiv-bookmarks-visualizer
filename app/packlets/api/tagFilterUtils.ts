@@ -1,8 +1,8 @@
-import { type SQL, and, eq, inArray } from "drizzle-orm";
-import type { ProcessedTags } from "./filterUtils";
-import { illustTagsTable, illustsTable, tagsTable } from "$db/schema";
 import { getDbClient } from "$db/connect";
+import { illustTagsTable, illustsTable, tagsTable } from "$db/schema";
+import { type SQL, and, eq, inArray } from "drizzle-orm";
 import { batchedQuery } from "./dbUtils";
+import type { ProcessedTags } from "./filterUtils";
 
 /**
  * Process tag filters and return the IDs of illustrations that match all included tags

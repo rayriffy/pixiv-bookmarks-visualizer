@@ -1,8 +1,8 @@
 import { type SQL, eq, gte, lte, ne, sql } from "drizzle-orm";
 
-import type { SearchRequest } from "$types/SearchRequest";
 import { illustsTable } from "$db/schema";
 import type { MinimumSizer } from "$types/MinimumSizer";
+import type { SearchRequest } from "$types/SearchRequest";
 
 /**
  * Process search request parameters into standardized arrays

@@ -1,6 +1,6 @@
-import { memo } from "react";
 import { Link, useSearch } from "@tanstack/react-router";
 import { clsx } from "clsx";
+import { memo } from "react";
 
 interface Props {
     max: number;

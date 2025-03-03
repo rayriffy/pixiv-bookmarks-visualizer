@@ -2,11 +2,11 @@ import { memo } from "react";
 
 import { useHover } from "web-api-hooks";
 
-import { RectangleStackIcon } from "@heroicons/react/24/solid";
 import type { ExtendedPixivIllust } from "$types/ExtendedPixivIllust";
-import { getOptimizedIllustUrl } from "./getOptimizedIllustUrl";
+import { RectangleStackIcon } from "@heroicons/react/24/solid";
 import { clsx } from "clsx";
 import { useSearchParams } from "../searchFilters/useSearchParams";
+import { getOptimizedIllustUrl } from "./getOptimizedIllustUrl";
 
 interface Props {
     illust: ExtendedPixivIllust;

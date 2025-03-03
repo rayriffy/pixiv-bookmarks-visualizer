@@ -1,8 +1,8 @@
-import type { SearchRequest } from "$types/SearchRequest";
-import { searchIllusts } from "$api/searchIllusts";
 import { parseQuery, withErrorHandling } from "$api/apiUtils";
-import { createAPIFileRoute } from "@tanstack/react-start/api";
+import { searchIllusts } from "$api/searchIllusts";
+import type { SearchRequest } from "$types/SearchRequest";
 import { json } from "@tanstack/react-start";
+import { createAPIFileRoute } from "@tanstack/react-start/api";
 
 export const APIRoute = createAPIFileRoute("/api/search")({
     GET: withErrorHandling(async ({ request }) => {

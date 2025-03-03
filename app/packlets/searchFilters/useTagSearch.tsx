@@ -1,11 +1,11 @@
-import { buildURLParams } from "./buildURLParams";
 import { TagSearchItem } from "./TagSearchItem";
+import { buildURLParams } from "./buildURLParams";
 import { useSearchParams } from "./useSearchParams";
 
-import type { ReactElement } from "react";
+import type { TagItem } from "$types/TagItem";
 import type { TagSearchRequest } from "$types/TagSearchRequest";
 import type { TagSearchResponse } from "$types/TagSearchResponse";
-import type { TagItem } from "$types/TagItem";
+import type { ReactElement } from "react";
 
 export const useTagSearch = (selectedTags: TagItem[], alreadySelectedTags?: TagItem[]) => {
     const { includeTags, excludeTags } = useSearchParams();

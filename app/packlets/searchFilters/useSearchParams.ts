@@ -1,8 +1,8 @@
-import { useState, useEffect, useCallback, useRef } from "react";
-import { useNavigate, useSearch } from "@tanstack/react-router";
-import { serializeFiltersToSearchParams, deserializeURLToFilters } from "./buildURLParams";
-import { minimumSizer as defaultMinimumSizer } from "./minimumSizer";
 import type { MinimumSizer } from "$types/MinimumSizer";
+import { useNavigate, useSearch } from "@tanstack/react-router";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { deserializeURLToFilters, serializeFiltersToSearchParams } from "./buildURLParams";
+import { minimumSizer as defaultMinimumSizer } from "./minimumSizer";
 
 // Define a TagItem interface for storing both the name and metadata
 export interface TagItem {

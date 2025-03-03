@@ -1,10 +1,10 @@
 import { and, count, inArray, sql } from "drizzle-orm";
 
-import type { TagSearchResponse } from "$types/TagSearchResponse";
+import { getDbClient } from "$db/connect";
+import { illustTagsTable, illustsTable, tagsTable } from "$db/schema";
 import type { SearchRequest } from "$types/SearchRequest";
 import type { Tag } from "$types/Tag";
-import { illustTagsTable, illustsTable, tagsTable } from "$db/schema";
-import { getDbClient } from "$db/connect";
+import type { TagSearchResponse } from "$types/TagSearchResponse";
 import { batchedQuery } from "./dbUtils";
 import { createFiltersFromSearchRequest, processTagParams } from "./filterUtils";
 import { processTagFilters } from "./tagFilterUtils";

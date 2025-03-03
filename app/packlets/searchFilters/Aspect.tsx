@@ -1,4 +1,4 @@
-import { type ChangeEvent, useEffect, useState, useRef } from "react";
+import { type ChangeEvent, useEffect, useRef, useState } from "react";
 import { useSearchParams } from "./useSearchParams";
 
 export const Aspect = () => {

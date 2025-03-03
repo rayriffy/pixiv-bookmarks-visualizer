@@ -1,11 +1,11 @@
-import { BookmarkType } from "./BookmarkType";
-import { IncludeTags } from "./IncludeTags";
-import { ExcludeTags } from "./ExcludeTags";
-import { Aspect } from "./Aspect";
-import { Size } from "./Size";
-import { PageCount } from "./PageCount";
 import { AI } from "./AI";
+import { Aspect } from "./Aspect";
+import { BookmarkType } from "./BookmarkType";
+import { ExcludeTags } from "./ExcludeTags";
+import { IncludeTags } from "./IncludeTags";
+import { PageCount } from "./PageCount";
 import { SafeForWork } from "./SafeForWork";
+import { Size } from "./Size";
 
 export const SearchFilters = () => {
     return (

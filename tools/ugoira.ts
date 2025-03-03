@@ -1,15 +1,15 @@
 import fs from "node:fs";
 import path from "node:path";
 
+import { Database } from "bun:sqlite";
+import dotenv from "dotenv";
+import { eq } from "drizzle-orm";
+import { drizzle } from "drizzle-orm/bun-sqlite";
 import PQueue from "p-queue";
 import Pixiv from "pixiv.ts";
-import dotenv from "dotenv";
-import { drizzle } from "drizzle-orm/bun-sqlite";
-import { Database } from "bun:sqlite";
-import { eq } from "drizzle-orm";
 
-import { promiseSpawn } from "./utils/promiseSpawn";
 import { illustsTable } from "$db/schema";
+import { promiseSpawn } from "./utils/promiseSpawn";
 
 dotenv.config();
 const { PIXIV_REFRESH_TOKEN, DB_FILE_NAME } = process.env;

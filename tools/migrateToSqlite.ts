@@ -1,11 +1,11 @@
+import { Database } from "bun:sqlite";
 import fs from "node:fs/promises";
 import path from "node:path";
 import destr from "destr";
-import { drizzle } from "drizzle-orm/bun-sqlite";
-import { Database } from "bun:sqlite";
 import dotenv from "dotenv";
+import { drizzle } from "drizzle-orm/bun-sqlite";
 
-import { illustsTable, tagsTable, usersTable, illustTagsTable, illustUsersTable } from "$db/schema";
+import { illustTagsTable, illustUsersTable, illustsTable, tagsTable, usersTable } from "$db/schema";
 
 import type { ExtendedPixivIllust } from "$types/ExtendedPixivIllust";
 

@@ -1,7 +1,7 @@
-import { type ChangeEventHandler, useCallback, useEffect, useState } from "react";
-import debounce from "lodash/debounce";
-import { useSearchParams } from "./useSearchParams";
 import { clsx } from "clsx";
+import debounce from "lodash/debounce";
+import { type ChangeEventHandler, useCallback, useEffect, useState } from "react";
+import { useSearchParams } from "./useSearchParams";
 
 export const Size = () => {
     const { minimumSizer, setMinimumSizer } = useSearchParams();

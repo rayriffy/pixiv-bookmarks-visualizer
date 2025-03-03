@@ -1,9 +1,9 @@
-import { type SQL, and, count, eq, inArray, not, or, sql } from "drizzle-orm";
-import type { TagSearchRequest } from "$types/TagSearchRequest";
-import type { TagSearchResponse } from "$types/TagSearchResponse";
-import type { Tag } from "$types/Tag";
 import { getDbClient } from "$db/connect";
 import { illustTagsTable, tagsTable } from "$db/schema";
+import type { Tag } from "$types/Tag";
+import type { TagSearchRequest } from "$types/TagSearchRequest";
+import type { TagSearchResponse } from "$types/TagSearchResponse";
+import { type SQL, and, count, eq, inArray, not, or, sql } from "drizzle-orm";
 import { batchedQuery } from "./dbUtils";
 
 /**

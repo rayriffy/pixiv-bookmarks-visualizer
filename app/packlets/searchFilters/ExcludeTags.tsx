@@ -1,9 +1,9 @@
-import { useTagSearch } from "./useTagSearch";
-import { useSearchParams } from "./useSearchParams";
-import { useRef, useEffect } from "react";
-import { TagSelector } from "./TagSelector";
-import { updateTagCounts } from "../../packlets/navigate/updateTagCounts";
 import type { TagItem } from "$types/TagItem";
+import { useEffect, useRef } from "react";
+import { updateTagCounts } from "../../packlets/navigate/updateTagCounts";
+import { TagSelector } from "./TagSelector";
+import { useSearchParams } from "./useSearchParams";
+import { useTagSearch } from "./useTagSearch";
 
 export const ExcludeTags = () => {
     const { includeTags, excludeTags, setExcludeTags } = useSearchParams();

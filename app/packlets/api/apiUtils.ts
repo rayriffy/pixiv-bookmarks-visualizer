@@ -1,5 +1,5 @@
-import type { StartAPIMethodCallback } from "@tanstack/react-start-api-routes";
 import { json } from "@tanstack/react-start";
+import type { StartAPIMethodCallback } from "@tanstack/react-start-api-routes";
 
 /**
  * Common error response structure

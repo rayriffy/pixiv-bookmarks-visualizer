@@ -1,9 +1,9 @@
-import Async from "react-select/async";
-// import { WindowedMenuList } from "react-windowed-select";
-import { useState, useRef, useEffect } from "react";
-import { TagSearchItem } from "./TagSearchItem";
 import type { TagItem } from "$types/TagItem";
+// import { WindowedMenuList } from "react-windowed-select";
+import { useEffect, useRef, useState } from "react";
 import type { ReactElement } from "react";
+import Async from "react-select/async";
+import { TagSearchItem } from "./TagSearchItem";
 
 interface TagSelectorProps {
     label: string;

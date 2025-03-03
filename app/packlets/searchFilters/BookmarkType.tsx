@@ -1,6 +1,6 @@
-import { type ChangeEvent, useEffect, useState, useRef } from "react";
-import { useSearchParams } from "./useSearchParams";
 import { useLocation } from "@tanstack/react-router";
+import { type ChangeEvent, useEffect, useRef, useState } from "react";
+import { useSearchParams } from "./useSearchParams";
 
 export const BookmarkType = () => {
     const { restriction, setRestriction } = useSearchParams();

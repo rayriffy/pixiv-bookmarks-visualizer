@@ -1,5 +1,5 @@
-import { memo } from "react";
 import type { Tag } from "$types/Tag";
+import { memo } from "react";
 
 export const TagSearchItem = memo<Tag>(({ name, count }) => (
     <p className="flex items-center">

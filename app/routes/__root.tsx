@@ -1,8 +1,8 @@
+import appCss from "$layout/app.css?url";
 import { HeadContent, Outlet, Scripts, createRootRoute } from "@tanstack/react-router";
-import { SWRConfig } from "swr";
 import { TanStackRouterDevtools } from "@tanstack/router-devtools";
 import type { ReactNode } from "react";
-import appCss from "$layout/app.css?url";
+import { SWRConfig } from "swr";
 
 export const Route = createRootRoute({
     head: () => ({
