@@ -1,7 +1,6 @@
 import appCss from "$layout/app.css?url";
 import { HeadContent, Outlet, Scripts, createRootRoute } from "@tanstack/react-router";
 import { TanStackRouterDevtools } from "@tanstack/router-devtools";
-import type { ReactNode } from "react";
 import { SWRConfig } from "swr";
 
 export const Route = createRootRoute({
@@ -21,30 +20,22 @@ export const Route = createRootRoute({
 });
 
 function RootComponent() {
-    return (
-        <RootDocument>
-            <SWRConfig
-                value={{
-                    fetcher: (resource, init) => fetch(resource, init).then((res) => res.json()),
-                }}
-            >
-                <Outlet />
-            </SWRConfig>
-        </RootDocument>
-    );
-}
-
-function RootDocument({ children }: { children: ReactNode }) {
-    return (
-        <html lang="en">
-            <head>
-                <HeadContent />
-            </head>
-            <body>
-                {children}
-                <TanStackRouterDevtools position="bottom-right" />
-                <Scripts />
-            </body>
-        </html>
-    );
+  return (
+    <html lang="en">
+      <head>
+        <HeadContent />
+      </head>
+      <body>
+      <SWRConfig
+        value={{
+          fetcher: (resource, init) => fetch(resource, init).then((res) => res.json()),
+        }}
+      >
+        <Outlet />
+      </SWRConfig>
+      <TanStackRouterDevtools position="bottom-right" />
+      <Scripts />
+      </body>
+    </html>
+  )
 }
