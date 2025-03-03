@@ -20,22 +20,22 @@ export const Route = createRootRoute({
 });
 
 function RootComponent() {
-  return (
-    <html lang="en">
-      <head>
-        <HeadContent />
-      </head>
-      <body>
-      <SWRConfig
-        value={{
-          fetcher: (resource, init) => fetch(resource, init).then((res) => res.json()),
-        }}
-      >
-        <Outlet />
-      </SWRConfig>
-      <TanStackRouterDevtools position="bottom-right" />
-      <Scripts />
-      </body>
-    </html>
-  )
+    return (
+        <html lang="en">
+            <head>
+                <HeadContent />
+            </head>
+            <body>
+                <SWRConfig
+                    value={{
+                        fetcher: (resource, init) => fetch(resource, init).then((res) => res.json()),
+                    }}
+                >
+                    <Outlet />
+                </SWRConfig>
+                <TanStackRouterDevtools position="bottom-right" />
+                <Scripts />
+            </body>
+        </html>
+    );
 }
