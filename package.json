@@ -12,7 +12,7 @@
         "build:data": "bun ./tools/fetcher.ts",
         "build:image": "bun ./tools/preloadImage.ts",
         "build:ugoira": "bun ./tools/ugoira.ts",
-        "db:init": "drizzle-kit push"
+        "db:init": "bun ./tools/dbInit.ts"
     },
     "dependencies": {
         "@heroicons/react": "2.2.0",
