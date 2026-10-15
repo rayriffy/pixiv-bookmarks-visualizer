@@ -5,7 +5,7 @@ Performing complex search with your pixiv bookmarks.
 
 The application uses TanStack Start 1.169.1, TanStack Router 1.170.44, React 19.3.0, and Vite 8.3.4. Versions are pinned in `package.json` and `bun.lock`. Bun 1.4.3 or newer is required for the application and SQLite scripts. Node 22.12 or newer is supported by the build tools; the application itself runs on Bun because its database driver uses `bun:sqlite`.
 
-The migration follows the current [Start Vite setup](https://tanstack.com/start/latest/docs/framework/react/build-from-scratch) and [Bun hosting guide](https://tanstack.com/start/latest/docs/framework/react/guide/hosting). `vite.config.ts` retains the `app/` source directory and `$` import aliases. Start generates the route tree and supplies its default client/server entries. API URLs and JSON shapes remain compatible; request middleware is registered in `app/start.ts`.
+The migration follows the current [Start Vite setup](https://tanstack.com/start/latest/docs/framework/react/build-from-scratch) and [Bun hosting guide](https://tanstack.com/start/latest/docs/framework/react/guide/hosting). `vite.config.ts` retains the `app/` source directory and `$` import aliases. Start generates the route tree and supplies its default client/server entries. API URLs and JSON shapes remain compatible.
 
 ![](./img/screenshot.jpg)
 
