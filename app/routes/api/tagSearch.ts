@@ -1,14 +1,17 @@
-import { parseQuery, withErrorHandling } from "$api/apiUtils";
+import { methodNotAllowed, parseQuery, withErrorHandling } from "$api/apiUtils";
 import { searchTags } from "$api/searchTags";
 import type { TagSearchRequest } from "$types/TagSearchRequest";
-import { json } from "@tanstack/react-start";
-import { createAPIFileRoute } from "@tanstack/react-start/api";
+import { createFileRoute } from "@tanstack/react-router";
 
-export const APIRoute = createAPIFileRoute("/api/tagSearch")({
-    GET: withErrorHandling(async ({ request }) => {
-        let tagSearchRequest = parseQuery<TagSearchRequest>(request);
-
-        const results = await searchTags(tagSearchRequest);
-        return json(results);
-    }, "Tag search"),
+export const Route = createFileRoute("/api/tagSearch")({
+    server: {
+        handlers: {
+            ANY: methodNotAllowed,
+            GET: withErrorHandling(async ({ request }) => {
+                const tagSearchRequest = parseQuery<TagSearchRequest>(request);
+                const results = await searchTags(tagSearchRequest);
+                return Response.json(results);
+            }, "Tag search"),
+        },
+    },
 });

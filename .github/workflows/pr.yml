@@ -6,47 +6,40 @@ on:
       - main
 
 jobs:
-  lint:
-    name: Lint
+  checks:
+    name: Migration and acceptance checks
     runs-on: ubuntu-latest
+    env:
+      TMPDIR: ${{ runner.temp }}
     steps:
-      - name: checkout
+      - name: Checkout
         uses: actions/checkout@v4
-      - name: bun
+      - name: Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Bun
         uses: oven-sh/setup-bun@v2
         with:
-          bun-version: latest
-      - name: install
-        run: bun i
-      - name: biome
-        run: bun biome ci
-
-  types:
-    name: Types
-    runs-on: ubuntu-latest
-    steps:
-      - name: checkout
-        uses: actions/checkout@v4
-      - name: bun
-        uses: oven-sh/setup-bun@v2
+          bun-version: 1.4.3
+      - name: Install pinned dependencies
+        run: bun install --frozen-lockfile
+      - name: Lint
+        run: bun run lint
+      - name: Types
+        run: bun run type-check
+      - name: Unit contracts
+        run: bun run test:unit
+      - name: Install browsers
+        run: bun run --bun playwright install --with-deps chromium firefox webkit
+      - name: Production acceptance
+        run: bun run test:e2e
+      - name: Development acceptance
+        run: bun run test:e2e:dev
+      - name: Failure evidence
+        if: failure()
+        uses: actions/upload-artifact@v4
         with:
-          bun-version: latest
-      - name: install
-        run: bun i
-      - name: tsc
-        run: bun type-check
-
-  build:
-    name: Build
-    runs-on: ubuntu-latest
-    steps:
-      - name: checkout
-        uses: actions/checkout@v4
-      - name: bun
-        uses: oven-sh/setup-bun@v2
-        with:
-          bun-version: latest
-      - name: install
-        run: bun i
-      - name: build
-        run: bun run build
+          name: playwright-evidence
+          path: ${{ runner.temp }}/pixiv-start-acceptance-*
+          if-no-files-found: ignore

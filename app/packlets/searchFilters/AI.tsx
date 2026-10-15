@@ -40,7 +40,7 @@ export const AI = () => {
         // Skip if we're not handling a user change
         if (!isHandlingChange.current) return;
 
-        const selectedMode = toggleAiOnly === toggleNonAiOnly ? "all" : toggleAiOnly ? "non-ai-only" : "ai-only";
+        const selectedMode = toggleAiOnly === toggleNonAiOnly ? "all" : toggleAiOnly ? "ai-only" : "non-ai-only";
         setAiMode(selectedMode);
     }, [toggleAiOnly, toggleNonAiOnly, setAiMode]);
 

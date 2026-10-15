@@ -52,9 +52,9 @@ export const createFiltersFromSearchRequest = (searchRequest: SearchRequest): SQ
 
     // 2. Aspect ratio filter (horizontal/vertical)
     if (searchRequest.aspect === "horizontal") {
-        filters.push(sql`${illustsTable.width} / ${illustsTable.height} >= 1`);
+        filters.push(sql`${illustsTable.width} >= ${illustsTable.height}`);
     } else if (searchRequest.aspect === "vertical") {
-        filters.push(sql`${illustsTable.width} / ${illustsTable.height} <= 1`);
+        filters.push(sql`${illustsTable.width} <= ${illustsTable.height}`);
     }
 
     // 3. Size filter (minimum width/height)

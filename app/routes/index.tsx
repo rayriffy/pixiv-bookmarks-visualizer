@@ -12,6 +12,7 @@ import { useEffect } from "react";
 import useSWR from "swr";
 
 export const Route = createFileRoute("/")({
+    validateSearch: (search: Record<string, unknown>) => search,
     component: Home,
 });
 

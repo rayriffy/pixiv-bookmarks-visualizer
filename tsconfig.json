@@ -1,5 +1,6 @@
 {
     "include": ["**/*.ts", "**/*.tsx"],
+    "exclude": ["node_modules", "dist", ".output", ".tanstack"],
     "compilerOptions": {
         "strict": true,
         "esModuleInterop": true,
@@ -13,10 +14,10 @@
         "target": "ES2022",
         "allowJs": true,
         "forceConsistentCasingInFileNames": true,
-        "baseUrl": ".",
         "paths": {
             "$*": ["./app/packlets/*"]
         },
-        "noEmit": true
+        "noEmit": true,
+        "types": ["vite/client", "bun"]
     }
 }

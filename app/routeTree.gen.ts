@@ -8,20 +8,105 @@
 // You should NOT make any changes in this file as it will be overwritten.
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
-// Import Routes
+import { Route as rootRouteImport } from './routes/__root'
+import { Route as IndexRouteImport } from './routes/index'
+import { Route as ApiPixivProxyRouteImport } from './routes/api/pixivProxy'
+import { Route as ApiSearchRouteImport } from './routes/api/search'
+import { Route as ApiTagSearchRouteImport } from './routes/api/tagSearch'
+import { Route as ApiTopTagsRouteImport } from './routes/api/topTags'
+import { Route as ApiUgoiraProxyRouteImport } from './routes/api/ugoiraProxy'
 
-import { Route as rootRoute } from './routes/__root'
-import { Route as IndexImport } from './routes/index'
-
-// Create/Update Routes
-
-const IndexRoute = IndexImport.update({
+const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiPixivProxyRoute = ApiPixivProxyRouteImport.update({
+  id: '/api/pixivProxy',
+  path: '/api/pixivProxy',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiSearchRoute = ApiSearchRouteImport.update({
+  id: '/api/search',
+  path: '/api/search',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiTagSearchRoute = ApiTagSearchRouteImport.update({
+  id: '/api/tagSearch',
+  path: '/api/tagSearch',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiTopTagsRoute = ApiTopTagsRouteImport.update({
+  id: '/api/topTags',
+  path: '/api/topTags',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiUgoiraProxyRoute = ApiUgoiraProxyRouteImport.update({
+  id: '/api/ugoiraProxy',
+  path: '/api/ugoiraProxy',
+  getParentRoute: () => rootRouteImport,
 } as any)
 
-// Populate the FileRoutesByPath interface
+export interface FileRoutesByFullPath {
+  '/': typeof IndexRoute
+  '/api/pixivProxy': typeof ApiPixivProxyRoute
+  '/api/search': typeof ApiSearchRoute
+  '/api/tagSearch': typeof ApiTagSearchRoute
+  '/api/topTags': typeof ApiTopTagsRoute
+  '/api/ugoiraProxy': typeof ApiUgoiraProxyRoute
+}
+export interface FileRoutesByTo {
+  '/': typeof IndexRoute
+  '/api/pixivProxy': typeof ApiPixivProxyRoute
+  '/api/search': typeof ApiSearchRoute
+  '/api/tagSearch': typeof ApiTagSearchRoute
+  '/api/topTags': typeof ApiTopTagsRoute
+  '/api/ugoiraProxy': typeof ApiUgoiraProxyRoute
+}
+export interface FileRoutesById {
+  __root__: typeof rootRouteImport
+  '/': typeof IndexRoute
+  '/api/pixivProxy': typeof ApiPixivProxyRoute
+  '/api/search': typeof ApiSearchRoute
+  '/api/tagSearch': typeof ApiTagSearchRoute
+  '/api/topTags': typeof ApiTopTagsRoute
+  '/api/ugoiraProxy': typeof ApiUgoiraProxyRoute
+}
+export interface FileRouteTypes {
+  fileRoutesByFullPath: FileRoutesByFullPath
+  fullPaths:
+    | '/'
+    | '/api/pixivProxy'
+    | '/api/search'
+    | '/api/tagSearch'
+    | '/api/topTags'
+    | '/api/ugoiraProxy'
+  fileRoutesByTo: FileRoutesByTo
+  to:
+    | '/'
+    | '/api/pixivProxy'
+    | '/api/search'
+    | '/api/tagSearch'
+    | '/api/topTags'
+    | '/api/ugoiraProxy'
+  id:
+    | '__root__'
+    | '/'
+    | '/api/pixivProxy'
+    | '/api/search'
+    | '/api/tagSearch'
+    | '/api/topTags'
+    | '/api/ugoiraProxy'
+  fileRoutesById: FileRoutesById
+}
+export interface RootRouteChildren {
+  IndexRoute: typeof IndexRoute
+  ApiPixivProxyRoute: typeof ApiPixivProxyRoute
+  ApiSearchRoute: typeof ApiSearchRoute
+  ApiTagSearchRoute: typeof ApiTagSearchRoute
+  ApiTopTagsRoute: typeof ApiTopTagsRoute
+  ApiUgoiraProxyRoute: typeof ApiUgoiraProxyRoute
+}
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
@@ -29,60 +114,65 @@ declare module '@tanstack/react-router' {
       id: '/'
       path: '/'
       fullPath: '/'
-      preLoaderRoute: typeof IndexImport
-      parentRoute: typeof rootRoute
+      preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/pixivProxy': {
+      id: '/api/pixivProxy'
+      path: '/api/pixivProxy'
+      fullPath: '/api/pixivProxy'
+      preLoaderRoute: typeof ApiPixivProxyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/search': {
+      id: '/api/search'
+      path: '/api/search'
+      fullPath: '/api/search'
+      preLoaderRoute: typeof ApiSearchRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/tagSearch': {
+      id: '/api/tagSearch'
+      path: '/api/tagSearch'
+      fullPath: '/api/tagSearch'
+      preLoaderRoute: typeof ApiTagSearchRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/topTags': {
+      id: '/api/topTags'
+      path: '/api/topTags'
+      fullPath: '/api/topTags'
+      preLoaderRoute: typeof ApiTopTagsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/ugoiraProxy': {
+      id: '/api/ugoiraProxy'
+      path: '/api/ugoiraProxy'
+      fullPath: '/api/ugoiraProxy'
+      preLoaderRoute: typeof ApiUgoiraProxyRouteImport
+      parentRoute: typeof rootRouteImport
     }
   }
-}
-
-// Create and export the route tree
-
-export interface FileRoutesByFullPath {
-  '/': typeof IndexRoute
-}
-
-export interface FileRoutesByTo {
-  '/': typeof IndexRoute
-}
-
-export interface FileRoutesById {
-  __root__: typeof rootRoute
-  '/': typeof IndexRoute
-}
-
-export interface FileRouteTypes {
-  fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
-  fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
-  fileRoutesById: FileRoutesById
-}
-
-export interface RootRouteChildren {
-  IndexRoute: typeof IndexRoute
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  ApiPixivProxyRoute: ApiPixivProxyRoute,
+  ApiSearchRoute: ApiSearchRoute,
+  ApiTagSearchRoute: ApiTagSearchRoute,
+  ApiTopTagsRoute: ApiTopTagsRoute,
+  ApiUgoiraProxyRoute: ApiUgoiraProxyRoute,
 }
-
-export const routeTree = rootRoute
+export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
 
-/* ROUTE_MANIFEST_START
-{
-  "routes": {
-    "__root__": {
-      "filePath": "__root.tsx",
-      "children": [
-        "/"
-      ]
-    },
-    "/": {
-      "filePath": "index.tsx"
-    }
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
   }
 }
-ROUTE_MANIFEST_END */

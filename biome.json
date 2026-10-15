@@ -7,7 +7,16 @@
     },
     "files": {
         "ignoreUnknown": false,
-        "ignore": ["**/*.gen.ts", "**/.output/**", "**/.vinxi/**"]
+        "ignore": [
+            "**/*.gen.ts",
+            "**/.output/**",
+            "**/.vinxi/**",
+            "**/.tanstack/**",
+            "**/dist/**",
+            "drizzle/meta/**",
+            "test-results/**",
+            "playwright-report/**"
+        ]
     },
     "formatter": {
         "enabled": true,

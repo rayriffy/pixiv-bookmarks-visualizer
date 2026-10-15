@@ -1,47 +1,41 @@
+import { updateTagCounts } from "$navigate/updateTagCounts";
 import type { TagItem } from "$types/TagItem";
-import { useEffect, useRef, useState } from "react";
-import type { ReactElement } from "react";
+import type { TagSearchResponse } from "$types/TagSearchResponse";
+import { type Dispatch, type ReactElement, type SetStateAction, useEffect, useMemo, useState } from "react";
 import Async from "react-select/async";
+import useSWR from "swr";
 import { TagSearchItem } from "./TagSearchItem";
 
 interface TagSelectorProps {
     label: string;
     tags: TagItem[];
-    loadOptions: (inputValue: string) => Promise<
-        {
-            value: TagItem;
-            label: ReactElement;
-        }[]
-    >;
-    onChange: (tags: TagItem[]) => void;
+    loadOptions: (inputValue: string) => Promise<{ value: TagItem; label: ReactElement }[]>;
+    onChange: Dispatch<SetStateAction<TagItem[]>>;
 }
 
 export const TagSelector = ({ label, tags, loadOptions, onChange }: TagSelectorProps) => {
     const [loading, setLoading] = useState(false);
-    const isHandlingChange = useRef(false);
-    const [selectValue, setSelectValue] = useState<
-        {
-            value: TagItem;
-            label: ReactElement;
-        }[]
-    >([]);
+    const { data } = useSWR<TagSearchResponse>("/api/topTags");
+    const inputId = label === "Include tags" ? "include-tags" : "exclude-tags";
 
-    // Update the select value whenever tags change
+    // Refresh metadata against the current selection; an old response cannot restore removed tags.
     useEffect(() => {
-        const newSelectValue = tags.map((tag) => ({
-            value: tag,
-            label: (
-                <TagSearchItem
-                    name={{
-                        original: tag.name,
-                        translated: tag.translated || null,
-                    }}
-                    count={tag.count || 0}
-                />
-            ),
-        }));
-        setSelectValue(newSelectValue);
-    }, [tags]);
+        if (data?.tags) onChange((previous) => updateTagCounts(previous, data.tags));
+    }, [data, onChange]);
+
+    const selectValue = useMemo(
+        () =>
+            tags.map((tag) => ({
+                value: tag,
+                label: (
+                    <TagSearchItem
+                        name={{ original: tag.name, translated: tag.translated || null }}
+                        count={tag.count || 0}
+                    />
+                ),
+            })),
+        [tags],
+    );
 
     const handleLoadOptions = async (inputValue: string) => {
         try {
@@ -52,50 +46,24 @@ export const TagSelector = ({ label, tags, loadOptions, onChange }: TagSelectorP
         }
     };
 
-    const handleChange = (
-        newValue: readonly {
-            value: TagItem;
-            label: ReactElement;
-        }[],
-    ) => {
-        // Avoid processing if we're already handling a change
-        if (isHandlingChange.current) return;
-
-        isHandlingChange.current = true;
-
-        try {
-            // Extract the tag values and ensure they're valid
-            const newTags = Array.isArray(newValue)
-                ? newValue.map((o) => o.value as TagItem).filter((tag) => tag && tag.name)
-                : [];
-
-            // Explicitly call with empty array if all tags were removed
-            onChange(newTags);
-        } finally {
-            // Reset the flag after a delay to allow state to update
-            setTimeout(() => {
-                isHandlingChange.current = false;
-            }, 100);
-        }
-    };
-
     return (
         <fieldset className="fieldset">
-            <label className="fieldset-label">{label}</label>
+            <label className="fieldset-label" htmlFor={inputId}>
+                {label}
+            </label>
             <Async
+                inputId={inputId}
+                instanceId={inputId}
                 isMulti
                 value={selectValue}
                 loadOptions={handleLoadOptions}
                 isLoading={loading}
-                onChange={handleChange}
+                onChange={(newValue) => onChange(newValue.map((option) => option.value).filter((tag) => tag.name))}
+                getOptionValue={(option) => option.value.name}
+                getOptionLabel={(option) => [option.value.name, option.value.translated].filter(Boolean).join(" ")}
+                formatOptionLabel={(option) => option.label}
                 isClearable={true}
-                styles={{
-                    menu: (provided) => ({
-                        ...provided,
-                        zIndex: 10,
-                    }),
-                }}
-                // Force sync updates for multi-select when clearing
+                styles={{ menu: (provided) => ({ ...provided, zIndex: 10 }) }}
                 closeMenuOnSelect={false}
                 cacheOptions={false}
                 defaultOptions={[]}

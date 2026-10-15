@@ -1,5 +1,7 @@
-import { json } from "@tanstack/react-start";
-import type { StartAPIMethodCallback } from "@tanstack/react-start-api-routes";
+type APIHandler = (context: { request: Request }) => Response | Promise<Response>;
+
+export const methodNotAllowed = () =>
+    new Response("Method Not Allowed", { status: 405, headers: { Allow: "GET, HEAD" } });
 
 /**
  * Common error response structure
@@ -12,16 +14,13 @@ interface ErrorResponse {
 /**
  * Wrap API handler with common error handling
  */
-export const withErrorHandling = <_T>(
-    handler: StartAPIMethodCallback<"GET">,
-    errorPrefix = "API",
-): StartAPIMethodCallback<""> => {
-    return async (...rest) => {
+export const withErrorHandling = (handler: APIHandler, errorPrefix = "API"): APIHandler => {
+    return async (context) => {
         try {
-            return handler(...rest);
+            return await handler(context);
         } catch (error) {
             console.error(`${errorPrefix} error:`, error);
-            return json(
+            return Response.json(
                 {
                     error: `An error occurred during ${errorPrefix.toLowerCase()}`,
                     message: error instanceof Error ? error.message : String(error),

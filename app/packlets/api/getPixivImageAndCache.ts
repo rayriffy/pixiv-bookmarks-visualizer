@@ -3,7 +3,7 @@ import path from "node:path";
 
 import sharp from "sharp";
 
-const cacheDirectory = path.join(process.cwd(), ".data/pixivProxy");
+const cacheDirectory = path.resolve(process.env.PIXIV_DATA_DIR ?? ".data", "pixivProxy");
 
 const dividerGroup = 1000000;
 

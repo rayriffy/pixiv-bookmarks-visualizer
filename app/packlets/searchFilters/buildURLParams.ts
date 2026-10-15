@@ -70,12 +70,7 @@ export const serializeFiltersToSearchParams = (filters: {
     }
 
     // Handle size filters
-    if (
-        filters.minimumSizer?.mode &&
-        filters.minimumSizer.mode !== "none" &&
-        filters.minimumSizer.size &&
-        filters.minimumSizer.size > 0
-    ) {
+    if (filters.minimumSizer?.mode && filters.minimumSizer.mode !== "none" && filters.minimumSizer.size >= 0) {
         searchParams["sizerMode"] = filters.minimumSizer.mode;
         searchParams["sizerSize"] = filters.minimumSizer.size;
     }
